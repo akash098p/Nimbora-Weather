@@ -1,0 +1,69 @@
+const NimboraWeatherIcon = (() => {
+  let last = "";
+  const el = () => document.querySelector("#currentWeatherIcon");
+  function type(code, day) {
+    if (code === 0) return day ? "clear-day" : "clear-night";
+    if (code === 1) return day ? "mainly-clear" : "mainly-clear-night";
+    if (code === 2) return day ? "partly-cloudy" : "partly-cloudy-night";
+    if (code === 3) return "overcast";
+    if (code === 45 || code === 48) return "fog";
+    if (code >= 51 && code <= 57) return "drizzle";
+    if (code >= 61 && code <= 67) return "rain";
+    if (code >= 71 && code <= 77) return "snow";
+    if (code >= 80 && code <= 82) return "showers";
+    if (code >= 85 && code <= 86) return "snow-showers";
+    if (code >= 95) return "thunderstorm";
+    return "unknown";
+  }
+  function svg(t) {
+    const cloud =
+      '<g class="wi-cloud"><path d="M24 72h58c13 0 24-9 24-21 0-12-10-22-22-22-3-14-15-24-30-24-16 0-29 12-31 28C10 34 0 44 0 57c0 8 6 15 14 15z"/></g>';
+    const sun =
+      '<g class="wi-sun"><circle cx="42" cy="42" r="24"/><g class="wi-rays"><path d="M42 5v12M42 67v12M5 42h12M67 42h12M16 16l9 9M59 59l9 9M68 16l-9 9M25 59l-9 9"/></g></g>';
+    const moon =
+      '<g class="wi-moon"><path d="M61 10c-20 4-34 22-31 42 3 20 21 33 41 29 9-2 17-7 22-14-7 3-14 4-21 2-18-4-29-22-25-40 2-8 7-14 14-19z"/></g>';
+    const rain =
+      '<g class="wi-rain"><path d="M25 84l-7 15M50 84l-7 15M75 84l-7 15"/></g>';
+    const snow =
+      '<g class="wi-snow"><path d="M25 88v18M17 97h16M19 91l12 12M31 91L19 103M55 88v18M47 97h16M49 91l12 12M61 91l-12 12M85 88v18M77 97h16M79 91l12 12M91 91l-12 12"/></g>';
+    const lightning =
+      '<path class="wi-lightning" d="M57 70H38l14-24h-9L62 20l-5 24h12z"/>';
+    let body =
+      t === "clear-day"
+        ? sun
+        : t === "clear-night"
+          ? moon
+          : ["mainly-clear", "partly-cloudy"].includes(t)
+            ? sun + cloud
+            : ["mainly-clear-night", "partly-cloudy-night"].includes(t)
+              ? moon + cloud
+              : cloud;
+    if (["drizzle", "rain", "showers"].includes(t)) body += rain;
+    if (["snow", "snow-showers"].includes(t)) body += snow;
+    if (t === "thunderstorm") body += rain + lightning;
+    if (t === "fog")
+      body += '<g class="wi-fog"><path d="M8 88h88M18 98h68M28 108h58"/></g>';
+    return `<svg class="weather-icon-svg" viewBox="0 0 110 115" role="img" aria-label="${t.replaceAll("-", " ")}">${body}</svg>`;
+  }
+  function render(code, isDay) {
+    const e = el();
+    if (!e) return;
+    const t = type(Number(code), !!isDay);
+    if (t === last) return;
+    last = t;
+    e.className = "weather-icon-large weather-icon-dynamic";
+    e.dataset.weather = t;
+    e.innerHTML = svg(t);
+    e.setAttribute("aria-label", t.replaceAll("-", " "));
+  }
+  function sync() {
+    const w = window.nimboraGetWeather?.();
+    if (w?.current) render(w.current.weather_code, w.current.is_day);
+  }
+  return { render, sync };
+})();
+window.nimboraWeatherIcon = NimboraWeatherIcon;
+document.addEventListener("DOMContentLoaded", () => {
+  NimboraWeatherIcon.sync();
+  setInterval(NimboraWeatherIcon.sync, 500);
+});

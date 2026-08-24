@@ -1,0 +1,393 @@
+const API = {
+  weather: "https://api.open-meteo.com/v1/forecast",
+  geocode: "https://geocoding-api.open-meteo.com/v1/search",
+  air: "https://air-quality-api.open-meteo.com/v1/air-quality",
+};
+const $ = (s) => document.querySelector(s),
+  E = {};
+[
+  "headerLocation",
+  "heroLocation",
+  "heroDate",
+  "currentTemp",
+  "conditionText",
+  "highTemp",
+  "lowTemp",
+  "aqiValue",
+  "aqiLabel",
+  "dailyForecast",
+  "hourlyForecast",
+  "chartLine",
+  "chartArea",
+  "chartHigh",
+  "chartLow",
+  "uvValue",
+  "uvNumber",
+  "uvLabel",
+  "humidityValue",
+  "humidityLabel",
+  "feelsValue",
+  "feelsLabel",
+  "windValue",
+  "windSpeed",
+  "windArrow",
+  "alertIcon",
+  "alertTitle",
+  "alertText",
+  "detailDate",
+  "precipValue",
+  "precipAmount",
+  "cloudValue",
+  "gustValue",
+  "rainValue",
+  "sunriseValue",
+  "sunsetValue",
+  "fullForecast",
+  "forecastOverlay",
+  "searchOverlay",
+  "searchInput",
+  "searchForm",
+  "searchResults",
+  "searchStatus",
+  "useLocation",
+  "closeSearch",
+  "closeForecast",
+  "toast",
+  "loading",
+].forEach((k) => (E[k] = $("#" + k)));
+const W = {
+  0: ["Clear sky", "☀️"],
+  1: ["Mainly clear", "🌤️"],
+  2: ["Partly cloudy", "⛅"],
+  3: ["Overcast", "☁️"],
+  45: ["Foggy", "🌫️"],
+  48: ["Rime fog", "🌫️"],
+  51: ["Light drizzle", "🌦️"],
+  53: ["Drizzle", "🌦️"],
+  55: ["Heavy drizzle", "🌧️"],
+  56: ["Freezing drizzle", "🌧️"],
+  57: ["Heavy freezing drizzle", "🌧️"],
+  61: ["Light rain", "🌦️"],
+  63: ["Rain", "🌧️"],
+  65: ["Heavy rain", "🌧️"],
+  66: ["Freezing rain", "🌧️"],
+  67: ["Heavy freezing rain", "🌧️"],
+  71: ["Light snow", "🌨️"],
+  73: ["Snow", "❄️"],
+  75: ["Heavy snow", "❄️"],
+  77: ["Snow grains", "🌨️"],
+  80: ["Rain showers", "🌦️"],
+  81: ["Rain showers", "🌧️"],
+  82: ["Heavy showers", "🌧️"],
+  85: ["Snow showers", "🌨️"],
+  86: ["Heavy snow showers", "❄️"],
+  95: ["Thunderstorm", "⛈️"],
+  96: ["Thunderstorm + hail", "⛈️"],
+  99: ["Thunderstorm + hail", "⛈️"],
+};
+let place = JSON.parse(localStorage.getItem("nimbora-place") || "null") || {
+  name: "Jamki",
+  latitude: 21.79,
+  longitude: 87.61,
+  timezone: "Asia/Kolkata",
+};
+let weather = null,
+  air = null,
+  timer;
+const info = (c) => W[c] || ["Unknown", "🌡️"],
+  temp = (v) => (v == null ? "--°" : Math.round(v) + "°"),
+  toast = (m) => {
+    if (!E.toast) return;
+    E.toast.textContent = m;
+    E.toast.classList.add("show");
+    clearTimeout(timer);
+    timer = setTimeout(() => E.toast.classList.remove("show"), 2600);
+  },
+  loading = (v) => {
+    if (E.loading) E.loading.hidden = !v;
+  };
+const time = (iso) =>
+  new Intl.DateTimeFormat("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: place.timezone,
+  }).format(new Date(iso));
+const date = (iso) =>
+  new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: place.timezone,
+  }).format(new Date(iso));
+async function json(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw Error(r.status);
+  return r.json();
+}
+async function load(p) {
+  loading(true);
+  try {
+    const q = {
+      latitude: p.latitude,
+      longitude: p.longitude,
+      timezone: "auto",
+      forecast_days: 7,
+      temperature_unit: "celsius",
+      wind_speed_unit: "kmh",
+      current:
+        "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,wind_direction_10m",
+      hourly:
+        "temperature_2m,weather_code,precipitation_probability,precipitation,uv_index,wind_speed_10m,wind_gusts_10m,cloud_cover",
+      daily:
+        "weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max,precipitation_sum,sunrise,sunset,wind_speed_10m_max,wind_gusts_10m_max,cloud_cover_mean",
+    };
+    [weather, air] = await Promise.all([
+      json(API.weather + "?" + new URLSearchParams(q)),
+      json(
+        API.air +
+          "?" +
+          new URLSearchParams({
+            latitude: p.latitude,
+            longitude: p.longitude,
+            timezone: "auto",
+            hourly: "us_aqi,pm2_5,pm10",
+          }),
+      ).catch(() => null),
+    ]);
+    place = p;
+    localStorage.setItem("nimbora-place", JSON.stringify(p));
+    render();
+  } catch (e) {
+    console.error(e);
+    toast("Unable to update weather right now.");
+  } finally {
+    loading(false);
+  }
+}
+function render() {
+  const c = weather.current,
+    d = weather.daily;
+  E.headerLocation.textContent = place.name;
+  E.heroLocation.textContent = place.name;
+  E.heroDate.textContent = date(c.time);
+  E.currentTemp.textContent = temp(c.temperature_2m);
+  E.conditionText.textContent = info(c.weather_code)[0];
+  E.highTemp.textContent = temp(d.temperature_2m_max[0]);
+  E.lowTemp.textContent = temp(d.temperature_2m_min[0]);
+  E.humidityValue.textContent = Math.round(c.relative_humidity_2m) + "%";
+  E.humidityLabel.textContent =
+    c.relative_humidity_2m > 80 ? "Very humid" : "Comfortable";
+  E.feelsValue.textContent = temp(c.apparent_temperature);
+  E.feelsLabel.textContent = "Feels like " + temp(c.apparent_temperature);
+  const dirs = [
+    "North",
+    "Northeast",
+    "East",
+    "Southeast",
+    "South",
+    "Southwest",
+    "West",
+    "Northwest",
+  ];
+  E.windValue.textContent = dirs[Math.round(c.wind_direction_10m / 45) % 8];
+  E.windSpeed.textContent = Math.round(c.wind_speed_10m) + " km/h";
+  E.windArrow.textContent = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"][
+    Math.round(c.wind_direction_10m / 45) % 8
+  ];
+  const uv = d.uv_index_max[0];
+  E.uvValue.textContent =
+    uv < 3 ? "Low" : uv < 6 ? "Moderate" : uv < 8 ? "High" : "Very high";
+  E.uvNumber.textContent = Math.round(uv);
+  E.uvLabel.textContent = "UV " + Math.round(uv);
+  const av = air?.hourly?.us_aqi || [];
+  E.aqiValue.textContent = av.length
+    ? Math.round(av[Math.min(av.length - 1, new Date().getHours())])
+    : "--";
+  E.aqiLabel.textContent = "Live AQI";
+  E.alertIcon.textContent =
+    c.weather_code >= 95 ? "!" : c.weather_code >= 51 ? "☂" : "✓";
+  E.alertTitle.textContent =
+    c.weather_code >= 95
+      ? "Thunderstorm risk"
+      : c.weather_code >= 51
+        ? "Rain in the forecast"
+        : "No active weather alert";
+  E.alertText.textContent =
+    c.weather_code >= 51
+      ? "Check precipitation and wind before heading out."
+      : "Current conditions look calm. Forecast data is up to date.";
+  daily(d);
+  hourly(weather.hourly, c.time);
+  chart(weather.hourly, c.time);
+  details();
+  full();
+  window.nimboraGetWeather = () => weather;
+  window.nimboraGetPlace = () => place;
+  window.nimboraBackground?.apply();
+  window.nimboraEffects?.refresh();
+  window.nimboraLeafletMap?.refresh();
+}
+function daily(d) {
+  const all = [
+      ...d.temperature_2m_max.slice(0, 5),
+      ...d.temperature_2m_min.slice(0, 5),
+    ],
+    lo = Math.min(...all),
+    hi = Math.max(...all);
+  E.dailyForecast.innerHTML = d.time
+    .slice(0, 5)
+    .map((x, i) => {
+      const n =
+        i === 0
+          ? "Today"
+          : i === 1
+            ? "Tomorrow"
+            : new Intl.DateTimeFormat("en-IN", { weekday: "long" }).format(
+                new Date(x + "T12:00:00"),
+              );
+      return `<div class="day-row"><span class="day-name">${n}</span><span class="weather-symbol">${info(d.weather_code[i])[1]}</span><span>${temp(d.temperature_2m_min[i])}</span><span class="range"><i style="left:${((d.temperature_2m_min[i] - lo) / Math.max(1, hi - lo)) * 100}%"></i></span><span>${temp(d.temperature_2m_max[i])}</span><span class="rain-badge">${d.precipitation_probability_max[i] ?? 0}%</span></div>`;
+    })
+    .join("");
+}
+function hourly(h, now) {
+  const s = Math.max(
+    0,
+    h.time.findIndex((x) => new Date(x) >= new Date(now)),
+  );
+  E.hourlyForecast.innerHTML = h.time
+    .slice(s, s + 8)
+    .map(
+      (x, i) =>
+        `<div class="hour"><span>${i ? "" : "Now"}${i ? time(x) : ""}</span><div>${info(h.weather_code[s + i])[1]}</div><b>${temp(h.temperature_2m[s + i])}</b><small>💧 ${h.precipitation_probability?.[s + i] ?? 0}%</small></div>`,
+    )
+    .join("");
+}
+function chart(h, now) {
+  const s = Math.max(
+      0,
+      h.time.findIndex((x) => new Date(x) >= new Date(now)),
+    ),
+    a = h.temperature_2m.slice(s, s + 24),
+    mx = Math.max(...a),
+    mn = Math.min(...a),
+    sp = Math.max(1, mx - mn),
+    p = a.map((v, i) => [
+      (i * 720) / (a.length - 1),
+      165 - ((v - mn) / sp) * 120,
+    ]);
+  const d = p
+    .map((q, i) => (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1))
+    .join(" ");
+  E.chartLine.setAttribute("d", d);
+  E.chartArea.setAttribute("d", d + " V190 H0 Z");
+  E.chartHigh.textContent = temp(mx);
+  E.chartLow.textContent = temp(mn);
+}
+function details() {
+  const d = weather.daily;
+  E.detailDate.textContent = date(weather.current.time);
+  E.precipValue.textContent = (d.precipitation_probability_max[0] ?? 0) + "%";
+  E.precipAmount.textContent =
+    (d.precipitation_sum?.[0] ?? 0).toFixed(1) + " mm expected";
+  E.cloudValue.textContent = Math.round(d.cloud_cover_mean?.[0] ?? 0) + "%";
+  E.gustValue.textContent =
+    Math.round(d.wind_gusts_10m_max?.[0] ?? 0) + " km/h";
+  E.rainValue.textContent = (d.precipitation_probability_max[0] ?? 0) + "%";
+  E.sunriseValue.textContent = time(d.sunrise[0]);
+  E.sunsetValue.textContent = time(d.sunset[0]);
+}
+function full() {
+  E.fullForecast.innerHTML = weather.daily.time
+    .map(
+      (x, i) =>
+        `<article class="full-day"><div><strong>${i ? "" : "Today"}${i ? new Intl.DateTimeFormat("en-IN", { weekday: "long", day: "numeric", month: "short" }).format(new Date(x + "T12:00:00")) : ""}</strong><span>${info(weather.daily.weather_code[i])[1]} ${info(weather.daily.weather_code[i])[0]}</span></div><div class="full-temp"><b>${temp(weather.daily.temperature_2m_max[i])}</b><span>${temp(weather.daily.temperature_2m_min[i])}</span></div><div class="full-meta"><span>💧 ${weather.daily.precipitation_probability_max[i] ?? 0}%</span><span>☀️ UV ${Math.round(weather.daily.uv_index_max[i] ?? 0)}</span><span>💨 ${Math.round(weather.daily.wind_speed_10m_max[i] ?? 0)} km/h</span></div></article>`,
+    )
+    .join("");
+}
+function searchOpen() {
+  E.searchOverlay.hidden = false;
+  E.searchInput.focus();
+}
+function searchClose() {
+  E.searchOverlay.hidden = true;
+}
+E.searchForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const q = E.searchInput.value.trim();
+  if (q.length < 2) return;
+  E.searchStatus.textContent = "Searching…";
+  try {
+    const r = await json(
+      API.geocode +
+        "?" +
+        new URLSearchParams({
+          name: q,
+          count: 8,
+          language: "en",
+          format: "json",
+        }),
+    );
+    E.searchResults.innerHTML = (r.results || [])
+      .map(
+        (x, i) =>
+          `<button class="result-button" data-i="${i}"><div><strong>${x.name}</strong><span>${[x.admin1, x.country].filter(Boolean).join(", ")}</span></div><b>›</b></button>`,
+      )
+      .join("");
+    E.searchStatus.textContent = (r.results || []).length + " locations found";
+    E.searchResults.querySelectorAll(".result-button").forEach(
+      (b) =>
+        (b.onclick = () => {
+          const x = r.results[+b.dataset.i];
+          searchClose();
+          load({
+            name: x.name,
+            latitude: x.latitude,
+            longitude: x.longitude,
+            timezone: x.timezone || "auto",
+            country: x.country,
+            admin1: x.admin1,
+          });
+        }),
+    );
+  } catch {
+    E.searchStatus.textContent = "Search failed.";
+  }
+};
+E.useLocation.onclick = () =>
+  navigator.geolocation?.getCurrentPosition(
+    (p) => {
+      searchClose();
+      load({
+        name: "Current location",
+        latitude: p.coords.latitude,
+        longitude: p.coords.longitude,
+        timezone: "auto",
+      });
+    },
+    () => toast("Location permission was not granted."),
+  );
+E.closeSearch.onclick = searchClose;
+E.closeForecast.onclick = () => (E.forecastOverlay.hidden = true);
+document.querySelectorAll("[data-action]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      const a = b.dataset.action;
+      if (a === "search" || a === "location") searchOpen();
+      if (a === "forecast") E.forecastOverlay.hidden = false;
+      if (a === "details")
+        document
+          .querySelector(".detail-card")
+          .scrollIntoView({ behavior: "smooth" });
+      if (a === "home") scrollTo({ top: 0, behavior: "smooth" });
+      if (a === "menu")
+        toast("Use Search or your current location to explore Nimbora.");
+    }),
+);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    searchClose();
+    E.forecastOverlay.hidden = true;
+  }
+});
+load(place);

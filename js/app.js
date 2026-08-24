@@ -1,0 +1,547 @@
+const API = {
+  geocode: "https://geocoding-api.open-meteo.com/v1/search",
+  weather: "https://api.open-meteo.com/v1/forecast",
+  airQuality: "https://air-quality-api.open-meteo.com/v1/air-quality",
+};
+const els = {
+  headerLocation: document.querySelector("#headerLocation"),
+  heroLocation: document.querySelector("#heroLocation"),
+  heroDate: document.querySelector("#heroDate"),
+  currentTemp: document.querySelector("#currentTemp"),
+  condition: document.querySelector("#conditionText"),
+  high: document.querySelector("#highTemp"),
+  low: document.querySelector("#lowTemp"),
+  aqi: document.querySelector("#aqiValue"),
+  aqiLabel: document.querySelector("#aqiLabel"),
+  daily: document.querySelector("#dailyForecast"),
+  hourly: document.querySelector("#hourlyForecast"),
+  chartLine: document.querySelector("#chartLine"),
+  chartArea: document.querySelector("#chartArea"),
+  chartHigh: document.querySelector("#chartHigh"),
+  chartLow: document.querySelector("#chartLow"),
+  uv: document.querySelector("#uvValue"),
+  uvNumber: document.querySelector("#uvNumber"),
+  uvLabel: document.querySelector("#uvLabel"),
+  humidity: document.querySelector("#humidityValue"),
+  humidityLabel: document.querySelector("#humidityLabel"),
+  feels: document.querySelector("#feelsValue"),
+  feelsLabel: document.querySelector("#feelsLabel"),
+  wind: document.querySelector("#windValue"),
+  windSpeed: document.querySelector("#windSpeed"),
+  windArrow: document.querySelector("#windArrow"),
+  alertTitle: document.querySelector("#alertTitle"),
+  alertText: document.querySelector("#alertText"),
+  alertIcon: document.querySelector("#alertIcon"),
+  searchOverlay: document.querySelector("#searchOverlay"),
+  searchInput: document.querySelector("#searchInput"),
+  searchForm: document.querySelector("#searchForm"),
+  searchResults: document.querySelector("#searchResults"),
+  searchStatus: document.querySelector("#searchStatus"),
+  closeSearch: document.querySelector("#closeSearch"),
+  useLocation: document.querySelector("#useLocation"),
+  toast: document.querySelector("#toast"),
+  loading: document.querySelector("#loading"),
+  forecastOverlay: document.querySelector("#forecastOverlay"),
+  closeForecast: document.querySelector("#closeForecast"),
+  fullForecast: document.querySelector("#fullForecast"),
+  detailDate: document.querySelector("#detailDate"),
+  precip: document.querySelector("#precipValue"),
+  precipAmount: document.querySelector("#precipAmount"),
+  cloud: document.querySelector("#cloudValue"),
+  gust: document.querySelector("#gustValue"),
+  rain: document.querySelector("#rainValue"),
+  sunrise: document.querySelector("#sunriseValue"),
+  sunset: document.querySelector("#sunsetValue"),
+};
+const WEATHER = {
+  0: ["Clear sky", "☀️"],
+  1: ["Mainly clear", "🌤️"],
+  2: ["Partly cloudy", "⛅"],
+  3: ["Overcast", "☁️"],
+  45: ["Foggy", "🌫️"],
+  48: ["Rime fog", "🌫️"],
+  51: ["Light drizzle", "🌦️"],
+  53: ["Drizzle", "🌦️"],
+  55: ["Heavy drizzle", "🌧️"],
+  56: ["Freezing drizzle", "🌧️"],
+  57: ["Heavy freezing drizzle", "🌧️"],
+  61: ["Light rain", "🌦️"],
+  63: ["Rain", "🌧️"],
+  65: ["Heavy rain", "🌧️"],
+  66: ["Freezing rain", "🌧️"],
+  67: ["Heavy freezing rain", "🌧️"],
+  71: ["Light snow", "🌨️"],
+  73: ["Snow", "❄️"],
+  75: ["Heavy snow", "❄️"],
+  77: ["Snow grains", "🌨️"],
+  80: ["Rain showers", "🌦️"],
+  81: ["Rain showers", "🌧️"],
+  82: ["Heavy showers", "🌧️"],
+  85: ["Snow showers", "🌨️"],
+  86: ["Heavy snow showers", "❄️"],
+  95: ["Thunderstorm", "⛈️"],
+  96: ["Thunderstorm + hail", "⛈️"],
+  99: ["Thunderstorm + hail", "⛈️"],
+};
+let state = {
+  place: {
+    name: "Jamki",
+    latitude: 21.79,
+    longitude: 87.61,
+    country: "India",
+    admin1: "West Bengal",
+    timezone: "Asia/Kolkata",
+  },
+  weather: null,
+  air: null,
+};
+let toastTimer;
+function showToast(message) {
+  if (!els.toast) return;
+  els.toast.textContent = message;
+  els.toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2600);
+}
+function setLoading(value) {
+  if (els.loading) els.loading.hidden = !value;
+}
+function weatherInfo(code) {
+  return WEATHER[code] || ["Unknown", "🌡️"];
+}
+function fmtTemp(value) {
+  return value == null ? "--°" : `${Math.round(value)}°`;
+}
+function fmtTime(iso) {
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: state.place.timezone,
+  }).format(new Date(iso));
+}
+function fmtDate(iso) {
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: state.place.timezone,
+  }).format(new Date(iso));
+}
+function windDirection(deg) {
+  const dirs = [
+    "North",
+    "Northeast",
+    "East",
+    "Southeast",
+    "South",
+    "Southwest",
+    "West",
+    "Northwest",
+  ];
+  return dirs[Math.round(deg / 45) % 8];
+}
+function windArrow(deg) {
+  return ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"][Math.round(deg / 45) % 8];
+}
+function aqiLabel(value) {
+  if (value == null) return "Unavailable";
+  if (value <= 20) return "Good";
+  if (value <= 40) return "Fair";
+  if (value <= 60) return "Moderate";
+  if (value <= 80) return "Poor";
+  return "Very poor";
+}
+function uvLabel(value) {
+  if (value == null) return "Unavailable";
+  if (value < 3) return "Low risk";
+  if (value < 6) return "Moderate";
+  if (value < 8) return "High risk";
+  if (value < 11) return "Very high";
+  return "Extreme";
+}
+async function getJSON(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Request failed (${response.status})`);
+  return response.json();
+}
+async function searchPlaces(query) {
+  const url = new URL(API.geocode);
+  url.search = new URLSearchParams({
+    name: query,
+    count: "8",
+    language: "en",
+    format: "json",
+  });
+  const data = await getJSON(url);
+  return data.results || [];
+}
+async function loadWeather(place) {
+  setLoading(true);
+  try {
+    const params = {
+      latitude: place.latitude,
+      longitude: place.longitude,
+      timezone: "auto",
+      forecast_days: "7",
+      temperature_unit: "celsius",
+      wind_speed_unit: "kmh",
+      current: [
+        "temperature_2m",
+        "relative_humidity_2m",
+        "apparent_temperature",
+        "is_day",
+        "weather_code",
+        "wind_speed_10m",
+        "wind_direction_10m",
+      ].join(","),
+      hourly: [
+        "temperature_2m",
+        "weather_code",
+        "relative_humidity_2m",
+        "precipitation_probability",
+        "precipitation",
+        "uv_index",
+        "wind_speed_10m",
+        "wind_gusts_10m",
+        "cloud_cover",
+      ].join(","),
+      daily: [
+        "weather_code",
+        "temperature_2m_max",
+        "temperature_2m_min",
+        "uv_index_max",
+        "precipitation_probability_max",
+        "precipitation_sum",
+        "rain_sum",
+        "sunrise",
+        "sunset",
+        "wind_speed_10m_max",
+        "wind_gusts_10m_max",
+        "cloud_cover_mean",
+      ].join(","),
+    };
+    const airParams = {
+      latitude: place.latitude,
+      longitude: place.longitude,
+      timezone: "auto",
+      hourly: "us_aqi,pm2_5,pm10",
+    };
+    const [weather, air] = await Promise.all([
+      getJSON(`${API.weather}?${new URLSearchParams(params)}`),
+      getJSON(`${API.airQuality}?${new URLSearchParams(airParams)}`).catch(
+        () => null,
+      ),
+    ]);
+    state = { place, weather, air };
+    render();
+    localStorage.setItem("nimbora-place", JSON.stringify(place));
+  } catch (error) {
+    console.error(error);
+    showToast("Couldn't load weather. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+}
+function render() {
+  const { place: wPlace, weather, air } = state,
+    c = weather.current,
+    info = weatherInfo(c.weather_code);
+  els.headerLocation.textContent = wPlace.name;
+  els.heroLocation.textContent = wPlace.name;
+  els.heroDate.textContent = fmtDate(c.time);
+  els.currentTemp.textContent = fmtTemp(c.temperature_2m);
+  els.condition.textContent = info[0];
+  els.high.textContent = fmtTemp(weather.daily.temperature_2m_max[0]);
+  els.low.textContent = fmtTemp(weather.daily.temperature_2m_min[0]);
+  const icon = document.querySelector("#currentWeatherIcon");
+  if (icon) {
+    icon.setAttribute("aria-label", info[0]);
+    icon.dataset.weather = String(c.weather_code);
+  }
+  els.humidity.textContent = `${Math.round(c.relative_humidity_2m)}%`;
+  els.humidityLabel.textContent =
+    c.relative_humidity_2m > 80
+      ? "Very humid"
+      : c.relative_humidity_2m > 60
+        ? "Humid"
+        : "Comfortable";
+  els.feels.textContent = fmtTemp(c.apparent_temperature);
+  els.feelsLabel.textContent = `Feels like ${fmtTemp(c.apparent_temperature)}`;
+  els.wind.textContent = windDirection(c.wind_direction_10m);
+  els.windSpeed.textContent = `${Math.round(c.wind_speed_10m)} km/h`;
+  els.windArrow.textContent = windArrow(c.wind_direction_10m);
+  const uv = weather.daily.uv_index_max[0];
+  els.uv.textContent = uvLabel(uv);
+  els.uvNumber.textContent = uv == null ? "--" : Math.round(uv);
+  els.uvLabel.textContent = uvLabel(uv);
+  renderAirQuality(air);
+  renderAlert(c.weather_code);
+  renderDaily(weather.daily);
+  renderHourly(weather.hourly, c.time);
+  renderChart(weather.hourly, c.time);
+  renderDetails(weather);
+}
+function renderAirQuality(air) {
+  if (!air?.hourly) {
+    els.aqi.textContent = "--";
+    els.aqiLabel.textContent = "Unavailable";
+    return;
+  }
+  const values = air.hourly.us_aqi || [],
+    times = air.hourly.time || [];
+  let best = 0,
+    min = Infinity,
+    now = Date.now();
+  times.forEach((t, i) => {
+    const d = Math.abs(new Date(t).getTime() - now);
+    if (d < min && values[i] != null) {
+      min = d;
+      best = i;
+    }
+  });
+  const value = values[best];
+  els.aqi.textContent = value == null ? "--" : Math.round(value);
+  els.aqiLabel.textContent = aqiLabel(value);
+}
+function renderAlert(code) {
+  if (code >= 95) {
+    els.alertIcon.textContent = "!";
+    els.alertTitle.textContent = "Thunderstorm risk";
+    els.alertText.textContent =
+      "Storm conditions are possible. Check the hourly forecast before heading out.";
+  } else if (code >= 51 && code <= 82) {
+    els.alertIcon.textContent = "☂";
+    els.alertTitle.textContent = "Rain in the forecast";
+    els.alertText.textContent =
+      "Keep an eye on precipitation chances throughout the day.";
+  } else {
+    els.alertIcon.textContent = "✓";
+    els.alertTitle.textContent = "No active weather alert";
+    els.alertText.textContent =
+      "Current conditions look calm. Forecast data is up to date.";
+  }
+}
+function renderDaily(d) {
+  const count = Math.min(5, d.time.length),
+    all = d.temperature_2m_max
+      .slice(0, count)
+      .concat(d.temperature_2m_min.slice(0, count)),
+    min = Math.min(...all),
+    max = Math.max(...all),
+    span = Math.max(1, max - min);
+  els.daily.innerHTML = Array.from({ length: count }, (_, i) => {
+    const date = new Date(`${d.time[i]}T12:00:00`),
+      name =
+        i === 0
+          ? "Today"
+          : i === 1
+            ? "Tomorrow"
+            : new Intl.DateTimeFormat("en-IN", {
+                weekday: "long",
+                timeZone: state.place.timezone,
+              }).format(date),
+      pos = ((d.temperature_2m_min[i] - min) / span) * 100,
+      icon = weatherInfo(d.weather_code[i])[1],
+      rain = d.precipitation_probability_max[i];
+    return `<div class="day-row"><span class="day-name">${name}</span><span class="weather-symbol" aria-hidden="true">${icon}</span><span>${fmtTemp(d.temperature_2m_min[i])}</span><span class="range" aria-hidden="true"><i style="left:${pos}%"></i></span><span>${fmtTemp(d.temperature_2m_max[i])}</span><span class="rain-badge">${rain ?? 0}%</span></div>`;
+  }).join("");
+}
+function renderHourly(h, currentTime) {
+  const nowIndex = Math.max(
+      0,
+      h.time.findIndex((t) => new Date(t) >= new Date(currentTime)),
+    ),
+    indices = [];
+  for (
+    let i = nowIndex < 0 ? 0 : nowIndex;
+    i < h.time.length && indices.length < 8;
+    i++
+  )
+    indices.push(i);
+  els.hourly.innerHTML = indices
+    .map((i, n) => {
+      const time = n === 0 ? "Now" : fmtTime(h.time[i]),
+        icon = weatherInfo(h.weather_code[i])[1],
+        rain = h.precipitation_probability?.[i] ?? 0;
+      return `<div class="hour"><span>${time}</span><div aria-hidden="true">${icon}</div><b>${fmtTemp(h.temperature_2m[i])}</b><small>💧 ${rain}%</small></div>`;
+    })
+    .join("");
+}
+function renderChart(h, currentTime) {
+  const start = Math.max(
+      0,
+      h.time.findIndex((t) => new Date(t) >= new Date(currentTime)),
+    ),
+    temps = h.temperature_2m.slice(start, start + 24).filter((v) => v != null);
+  if (temps.length < 2) return;
+  const max = Math.max(...temps),
+    min = Math.min(...temps),
+    span = Math.max(1, max - min),
+    pts = temps.map((v, i) => [
+      (i / (temps.length - 1)) * 720,
+      165 - ((v - min) / span) * 120,
+    ]);
+  const line = pts
+      .map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`)
+      .join(" "),
+    area = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)} ${pts
+      .slice(1)
+      .map(([x, y]) => `L${x.toFixed(1)} ${y.toFixed(1)}`)
+      .join(" ")} V190 H0 Z`;
+  els.chartLine.setAttribute("d", line);
+  els.chartArea.setAttribute("d", area);
+  els.chartHigh.textContent = fmtTemp(max);
+  els.chartLow.textContent = fmtTemp(min);
+}
+function renderDetails(weather) {
+  const d = weather.daily,
+    h = weather.hourly;
+  els.detailDate.textContent = fmtDate(weather.current.time);
+  els.precip.textContent = `${d.precipitation_probability_max[0] ?? 0}%`;
+  els.precipAmount.textContent = `${(d.precipitation_sum?.[0] ?? 0).toFixed(1)} mm expected`;
+  els.cloud.textContent = `${Math.round(d.cloud_cover_mean?.[0] ?? 0)}%`;
+  els.gust.textContent = `${Math.round(d.wind_gusts_10m_max?.[0] ?? 0)} km/h`;
+  els.rain.textContent = `${d.precipitation_probability_max[0] ?? 0}%`;
+  els.sunrise.textContent = fmtTime(d.sunrise[0]);
+  els.sunset.textContent = fmtTime(d.sunset[0]);
+}
+function openFullForecast() {
+  if (!els.fullForecast) return;
+  const d = state.weather?.daily;
+  if (!d) return;
+  els.fullForecast.innerHTML = d.time
+    .map((date, i) => {
+      const name =
+          i === 0
+            ? "Today"
+            : i === 1
+              ? "Tomorrow"
+              : new Intl.DateTimeFormat("en-IN", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "short",
+                  timeZone: state.place.timezone,
+                }).format(new Date(`${date}T12:00:00`)),
+        info = weatherInfo(d.weather_code[i]);
+      return `<article class="full-day"><div><strong>${name}</strong><span>${info[1]} ${info[0]}</span></div><div class="full-temp"><b>${fmtTemp(d.temperature_2m_max[i])}</b><span>${fmtTemp(d.temperature_2m_min[i])}</span></div><div class="full-meta"><span>💧 ${d.precipitation_probability_max[i] ?? 0}%</span><span>☀️ UV ${Math.round(d.uv_index_max[i] ?? 0)}</span><span>💨 ${Math.round(d.wind_speed_10m_max[i] ?? 0)} km/h</span></div></article>`;
+    })
+    .join("");
+  els.forecastOverlay.hidden = false;
+}
+function closeFullForecast() {
+  if (els.forecastOverlay) els.forecastOverlay.hidden = true;
+}
+function openSearch() {
+  els.searchOverlay.hidden = false;
+  els.searchInput.value = "";
+  els.searchStatus.textContent = "Search for a city, town or postcode.";
+  els.searchResults.innerHTML = "";
+  setTimeout(() => els.searchInput.focus(), 50);
+}
+function closeSearch() {
+  els.searchOverlay.hidden = true;
+}
+els.searchForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const query = els.searchInput.value.trim();
+  if (query.length < 2) {
+    els.searchStatus.textContent = "Enter at least 2 characters.";
+    return;
+  }
+  els.searchStatus.textContent = "Searching…";
+  els.searchResults.innerHTML = "";
+  try {
+    const results = await searchPlaces(query);
+    if (!results.length) {
+      els.searchStatus.textContent = "No locations found.";
+      return;
+    }
+    els.searchStatus.textContent = `${results.length} locations found`;
+    els.searchResults.innerHTML = results
+      .map(
+        (r, i) =>
+          `<button class="result-button" type="button" data-result="${i}"><div><strong>${r.name}</strong><span>${[r.admin1, r.country].filter(Boolean).join(", ")}</span></div><b>›</b></button>`,
+      )
+      .join("");
+    els.searchResults.querySelectorAll("[data-result]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const r = results[Number(btn.dataset.result)];
+        closeSearch();
+        loadWeather({
+          name: r.name,
+          latitude: r.latitude,
+          longitude: r.longitude,
+          country: r.country,
+          admin1: r.admin1,
+          timezone: r.timezone || "auto",
+        });
+      }),
+    );
+  } catch (err) {
+    els.searchStatus.textContent = "Search failed. Check your connection.";
+  }
+});
+els.useLocation?.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    showToast("Geolocation is not supported by this browser.");
+    return;
+  }
+  setLoading(true);
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      closeSearch();
+      loadWeather({
+        name: "Current location",
+        latitude,
+        longitude,
+        country: "",
+        admin1: "",
+        timezone: "auto",
+      });
+    },
+    () => {
+      setLoading(false);
+      showToast("Location permission was not granted.");
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 },
+  );
+});
+els.closeSearch?.addEventListener("click", closeSearch);
+els.closeForecast?.addEventListener("click", closeFullForecast);
+els.forecastOverlay?.addEventListener("click", (e) => {
+  if (e.target === els.forecastOverlay) closeFullForecast();
+});
+els.searchOverlay?.addEventListener("click", (e) => {
+  if (e.target === els.searchOverlay) closeSearch();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeSearch();
+    closeFullForecast();
+  }
+});
+document.querySelectorAll("[data-action]").forEach((button) =>
+  button.addEventListener("click", () => {
+    const action = button.dataset.action;
+    if (action === "home") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (action === "search" || action === "location") openSearch();
+    if (action === "forecast") openFullForecast();
+    if (action === "details")
+      document
+        .querySelector(".detail-card")
+        ?.scrollIntoView({ behavior: "smooth" });
+    if (action === "menu")
+      showToast("Use Search to change location or use your current location.");
+  }),
+);
+async function init() {
+  try {
+    const saved = localStorage.getItem("nimbora-place");
+    await loadWeather(saved ? JSON.parse(saved) : state.place);
+  } catch (e) {
+    await loadWeather(state.place);
+  }
+}
+init();
