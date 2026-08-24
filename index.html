@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nimbora — a modern weather forecasting experience.">
+  <title>Nimbora Weather</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div class="weather-app">
+    <header class="topbar">
+      <div class="brand">Nimbora</div>
+      <div class="location">Jamki</div>
+      <div class="top-actions">
+        <button aria-label="Add location">+</button>
+        <button aria-label="More options">⋮</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="hero">
+        <div class="location-meta">Jamki <span>• • •</span></div>
+        <div class="temperature">27°</div>
+        <div class="condition">Cloudy <span>32° / 27°</span></div>
+        <div class="aqi">🍃 AQI 16</div>
+      </section>
+
+      <section class="glass-card alert-card">
+        <div class="alert-icon">⚠</div>
+        <div><h2>Yellow Watch for Lightning</h2><p>Weather alert details will appear here.</p></div>
+      </section>
+
+      <section class="glass-card forecast-card">
+        <div class="section-heading">◉ <span>5-day forecast</span></div>
+        <div id="dailyForecast" class="daily-list"></div>
+        <button class="wide-button">5-day forecast</button>
+      </section>
+
+      <section class="glass-card hourly-card">
+        <div class="section-heading">24-hour forecast</div>
+        <div class="chart"><svg viewBox="0 0 700 180" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,110 80,98 160,112 240,80 320,96 400,55 480,72 560,50 640,75 700,60"></polyline></svg></div>
+        <div id="hourlyForecast" class="hourly-list"></div>
+      </section>
+
+      <section class="metric-grid">
+        <article class="glass-card metric"><span>UV</span><strong>Weak</strong><b>1</b></article>
+        <article class="glass-card metric"><span>Humidity</span><strong>91%</strong><b>💧</b></article>
+        <article class="glass-card metric"><span>Real feel</span><strong>28°</strong><b>°</b></article>
+        <article class="glass-card metric"><span>Wind</span><strong>Southwest</strong><b>↙</b></article>
+      </section>
+    </main>
+  </div>
+  <script src="src/app.js"></script>
+</body>
+</html>
