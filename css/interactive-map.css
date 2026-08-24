@@ -1,0 +1,120 @@
+.interactive-map-card {
+  padding: 25px 26px;
+  margin-bottom: 18px;
+}
+.interactive-map {
+  height: 360px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  background: #dbe8ef;
+}
+.map-canvas {
+  position: absolute;
+  width: 768px;
+  height: 768px;
+  left: 50%;
+  top: 50%;
+  margin-left: -384px;
+  margin-top: -384px;
+  transition: transform 0.18s ease;
+  cursor: grab;
+}
+.map-canvas:active {
+  cursor: grabbing;
+}
+.map-canvas img {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  object-fit: cover;
+}
+.map-pin {
+  position: absolute;
+  left: 384px;
+  top: 384px;
+  transform: translate(-50%, -50%);
+  color: #35d8ff;
+  text-shadow: 0 0 12px #05759c;
+  font-size: 30px;
+  z-index: 2;
+}
+.map-pin span {
+  position: absolute;
+  left: 50%;
+  top: 34px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgba(15, 42, 70, 0.84);
+  color: #fff;
+  border-radius: 10px;
+  padding: 5px 8px;
+  font-size: 10px;
+}
+.map-control {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  display: grid;
+  gap: 5px;
+}
+.map-control.left {
+  left: 12px;
+}
+.map-control button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(20, 45, 72, 0.78);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+.map-layers {
+  position: absolute;
+  z-index: 3;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 13px;
+  background: rgba(20, 45, 72, 0.72);
+  backdrop-filter: blur(8px);
+}
+.map-layers button {
+  border: 0;
+  background: transparent;
+  color: #d9eafa;
+  padding: 7px 9px;
+  border-radius: 9px;
+  font-size: 10px;
+  cursor: pointer;
+}
+.map-layers button.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.interactive-map-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+}
+.interactive-map-footer strong {
+  color: #fff;
+}
+.interactive-map-footer span:last-child {
+  margin-left: auto;
+}
+.map-note {
+  padding: 11px 13px;
+  margin-top: 10px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.58);
+}
