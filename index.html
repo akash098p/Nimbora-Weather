@@ -3,53 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2f6fb8">
   <meta name="description" content="Nimbora — a modern weather forecasting experience.">
   <title>Nimbora Weather</title>
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
   <div class="weather-app">
+    <div class="sky-scene" aria-hidden="true">
+      <div class="sun-glow"></div>
+      <div class="cloud cloud-one"></div>
+      <div class="cloud cloud-two"></div>
+      <div class="haze"></div>
+    </div>
+
     <header class="topbar">
-      <div class="brand">Nimbora</div>
-      <div class="location">Jamki</div>
+      <button class="brand" type="button" data-action="home" aria-label="Nimbora home">Nimbora</button>
+      <button class="location-pill" type="button" data-action="location" aria-label="Change location">
+        <span class="pin">⌖</span><span id="headerLocation">Jamki</span><span class="chevron">⌄</span>
+      </button>
       <div class="top-actions">
-        <button aria-label="Add location">+</button>
-        <button aria-label="More options">⋮</button>
+        <button type="button" data-action="search" aria-label="Search location">⌕</button>
+        <button type="button" data-action="menu" aria-label="More options">⋮</button>
       </div>
     </header>
 
     <main class="content">
-      <section class="hero">
-        <div class="location-meta">Jamki <span>• • •</span></div>
-        <div class="temperature">27°</div>
-        <div class="condition">Cloudy <span>32° / 27°</span></div>
-        <div class="aqi">🍃 AQI 16</div>
+      <section class="hero" aria-label="Current weather">
+        <div class="hero-location"><span class="live-dot"></span><span id="heroLocation">Jamki</span></div>
+        <div class="hero-date" id="heroDate">Monday, 24 August</div>
+        <div class="temperature-row"><div id="currentTemp" class="temperature">27°</div><div class="weather-icon weather-icon-large cloudy" aria-label="Cloudy"></div></div>
+        <div class="condition"><span id="conditionText">Cloudy</span><span class="high-low"><b>32°</b><i></i><b>27°</b></span></div>
+        <div class="aqi"><span class="leaf">◌</span><span>AQI</span><strong>16</strong><span class="good">Good</span></div>
       </section>
 
       <section class="glass-card alert-card">
-        <div class="alert-icon">⚠</div>
-        <div><h2>Yellow Watch for Lightning</h2><p>Weather alert details will appear here.</p></div>
+        <div class="alert-icon">!</div>
+        <div class="alert-copy"><h2>Yellow Watch for Lightning</h2><p>Lightning is possible in your area.</p></div>
+        <button class="card-arrow" type="button" aria-label="Open weather alert">›</button>
       </section>
 
       <section class="glass-card forecast-card">
-        <div class="section-heading">◉ <span>5-day forecast</span></div>
+        <div class="section-heading"><span class="heading-icon">◷</span><span>5-day forecast</span><span class="section-caption">Temperature</span></div>
         <div id="dailyForecast" class="daily-list"></div>
-        <button class="wide-button">5-day forecast</button>
+        <button class="wide-button" type="button" data-action="forecast">View 5-day forecast <span>›</span></button>
       </section>
 
       <section class="glass-card hourly-card">
-        <div class="section-heading">24-hour forecast</div>
-        <div class="chart"><svg viewBox="0 0 700 180" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,110 80,98 160,112 240,80 320,96 400,55 480,72 560,50 640,75 700,60"></polyline></svg></div>
+        <div class="section-heading"><span>24-hour forecast</span><span class="section-caption">Hourly</span></div>
+        <div class="chart-wrap">
+          <div class="chart-labels"><span>32°</span><span>30°</span><span>28°</span><span>26°</span></div>
+          <svg class="chart" viewBox="0 0 720 190" preserveAspectRatio="none" aria-label="Temperature trend">
+            <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-opacity=".28"/><stop offset="1" stop-opacity="0"/></linearGradient></defs>
+            <path class="chart-area" d="M0 126 C70 112 105 130 150 108 S230 72 290 94 S365 123 420 76 S500 50 555 68 S640 100 720 66 V190 H0Z"/>
+            <path class="chart-line" d="M0 126 C70 112 105 130 150 108 S230 72 290 94 S365 123 420 76 S500 50 555 68 S640 100 720 66"/>
+          </svg>
+        </div>
         <div id="hourlyForecast" class="hourly-list"></div>
       </section>
 
       <section class="metric-grid">
-        <article class="glass-card metric"><span>UV</span><strong>Weak</strong><b>1</b></article>
-        <article class="glass-card metric"><span>Humidity</span><strong>91%</strong><b>💧</b></article>
-        <article class="glass-card metric"><span>Real feel</span><strong>28°</strong><b>°</b></article>
-        <article class="glass-card metric"><span>Wind</span><strong>Southwest</strong><b>↙</b></article>
+        <article class="glass-card metric"><div><span>UV index</span><strong>Weak</strong><small>Low risk</small></div><div class="metric-ring"><b>1</b></div></article>
+        <article class="glass-card metric"><div><span>Humidity</span><strong>91%</strong><small>Very humid</small></div><div class="metric-symbol">💧</div></article>
+        <article class="glass-card metric"><div><span>Real feel</span><strong>28°</strong><small>Feels like 28°</small></div><div class="metric-symbol">🌡</div></article>
+        <article class="glass-card metric"><div><span>Wind</span><strong>Southwest</strong><small>12 km/h</small></div><div class="wind-arrow">↙</div></article>
       </section>
     </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
   <script src="src/app.js"></script>
 </body>
