@@ -10,67 +10,61 @@
 </head>
 <body>
   <div class="weather-app">
-    <div class="sky-scene" aria-hidden="true">
-      <div class="sun-glow"></div>
-      <div class="cloud cloud-one"></div>
-      <div class="cloud cloud-two"></div>
-      <div class="haze"></div>
-    </div>
+    <div class="sky-scene" aria-hidden="true"><div class="sun-glow"></div><div class="cloud cloud-one"></div><div class="cloud cloud-two"></div><div class="haze"></div></div>
 
     <header class="topbar">
       <button class="brand" type="button" data-action="home" aria-label="Nimbora home">Nimbora</button>
-      <button class="location-pill" type="button" data-action="location" aria-label="Change location">
-        <span class="pin">⌖</span><span id="headerLocation">Jamki</span><span class="chevron">⌄</span>
-      </button>
-      <div class="top-actions">
-        <button type="button" data-action="search" aria-label="Search location">⌕</button>
-        <button type="button" data-action="menu" aria-label="More options">⋮</button>
-      </div>
+      <button class="location-pill" type="button" data-action="location" aria-label="Change location"><span class="pin">⌖</span><span id="headerLocation">Jamki</span><span class="chevron">⌄</span></button>
+      <div class="top-actions"><button type="button" data-action="search" aria-label="Search location">⌕</button><button type="button" data-action="menu" aria-label="More options">⋮</button></div>
     </header>
 
     <main class="content">
       <section class="hero" aria-label="Current weather">
         <div class="hero-location"><span class="live-dot"></span><span id="heroLocation">Jamki</span></div>
-        <div class="hero-date" id="heroDate">Monday, 24 August</div>
-        <div class="temperature-row"><div id="currentTemp" class="temperature">27°</div><div class="weather-icon weather-icon-large cloudy" aria-label="Cloudy"></div></div>
-        <div class="condition"><span id="conditionText">Cloudy</span><span class="high-low"><b>32°</b><i></i><b>27°</b></span></div>
-        <div class="aqi"><span class="leaf">◌</span><span>AQI</span><strong>16</strong><span class="good">Good</span></div>
+        <div class="hero-date" id="heroDate">Loading local time…</div>
+        <div class="temperature-row"><div id="currentTemp" class="temperature">--°</div><div id="currentWeatherIcon" class="weather-icon-large cloudy" aria-label="Current weather"></div></div>
+        <div class="condition"><span id="conditionText">Loading weather…</span><span class="high-low"><b id="highTemp">--°</b><i></i><b id="lowTemp">--°</b></span></div>
+        <div class="aqi"><span class="leaf">◌</span><span>AQI</span><strong id="aqiValue">--</strong><span id="aqiLabel" class="good">Loading</span></div>
       </section>
 
       <section class="glass-card alert-card">
-        <div class="alert-icon">!</div>
-        <div class="alert-copy"><h2>Yellow Watch for Lightning</h2><p>Lightning is possible in your area.</p></div>
-        <button class="card-arrow" type="button" aria-label="Open weather alert">›</button>
+        <div id="alertIcon" class="alert-icon">i</div>
+        <div class="alert-copy"><h2 id="alertTitle">Weather conditions</h2><p id="alertText">Live forecast information will appear here.</p></div>
+        <button class="card-arrow" type="button" data-action="details" aria-label="Open weather details">›</button>
       </section>
 
       <section class="glass-card forecast-card">
         <div class="section-heading"><span class="heading-icon">◷</span><span>5-day forecast</span><span class="section-caption">Temperature</span></div>
-        <div id="dailyForecast" class="daily-list"></div>
+        <div id="dailyForecast" class="daily-list"><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div></div>
         <button class="wide-button" type="button" data-action="forecast">View 5-day forecast <span>›</span></button>
       </section>
 
       <section class="glass-card hourly-card">
         <div class="section-heading"><span>24-hour forecast</span><span class="section-caption">Hourly</span></div>
-        <div class="chart-wrap">
-          <div class="chart-labels"><span>32°</span><span>30°</span><span>28°</span><span>26°</span></div>
-          <svg class="chart" viewBox="0 0 720 190" preserveAspectRatio="none" aria-label="Temperature trend">
-            <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-opacity=".28"/><stop offset="1" stop-opacity="0"/></linearGradient></defs>
-            <path class="chart-area" d="M0 126 C70 112 105 130 150 108 S230 72 290 94 S365 123 420 76 S500 50 555 68 S640 100 720 66 V190 H0Z"/>
-            <path class="chart-line" d="M0 126 C70 112 105 130 150 108 S230 72 290 94 S365 123 420 76 S500 50 555 68 S640 100 720 66"/>
-          </svg>
-        </div>
-        <div id="hourlyForecast" class="hourly-list"></div>
+        <div class="chart-wrap"><div class="chart-labels"><span id="chartHigh">--°</span><span>--°</span><span id="chartLow">--°</span></div><svg class="chart" viewBox="0 0 720 190" preserveAspectRatio="none" aria-label="Temperature trend"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-opacity=".28"/><stop offset="1" stop-opacity="0"/></linearGradient></defs><path id="chartArea" class="chart-area" d="M0 120 L720 80 V190 H0Z"/><path id="chartLine" class="chart-line" d="M0 120 L720 80"/></svg></div>
+        <div id="hourlyForecast" class="hourly-list"><div class="skeleton-hour"></div><div class="skeleton-hour"></div><div class="skeleton-hour"></div><div class="skeleton-hour"></div></div>
       </section>
 
       <section class="metric-grid">
-        <article class="glass-card metric"><div><span>UV index</span><strong>Weak</strong><small>Low risk</small></div><div class="metric-ring"><b>1</b></div></article>
-        <article class="glass-card metric"><div><span>Humidity</span><strong>91%</strong><small>Very humid</small></div><div class="metric-symbol">💧</div></article>
-        <article class="glass-card metric"><div><span>Real feel</span><strong>28°</strong><small>Feels like 28°</small></div><div class="metric-symbol">🌡</div></article>
-        <article class="glass-card metric"><div><span>Wind</span><strong>Southwest</strong><small>12 km/h</small></div><div class="wind-arrow">↙</div></article>
+        <article class="glass-card metric"><div><span>UV index</span><strong id="uvValue">--</strong><small id="uvLabel">Loading</small></div><div class="metric-ring"><b id="uvNumber">--</b></div></article>
+        <article class="glass-card metric"><div><span>Humidity</span><strong id="humidityValue">--%</strong><small id="humidityLabel">Loading</small></div><div class="metric-symbol">💧</div></article>
+        <article class="glass-card metric"><div><span>Real feel</span><strong id="feelsValue">--°</strong><small id="feelsLabel">Feels like --°</small></div><div class="metric-symbol">🌡</div></article>
+        <article class="glass-card metric"><div><span>Wind</span><strong id="windValue">--</strong><small id="windSpeed">-- km/h</small></div><div id="windArrow" class="wind-arrow">↙</div></article>
       </section>
+      <p class="attribution">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · Location data by GeoNames</p>
     </main>
 
+    <div id="searchOverlay" class="search-overlay" hidden>
+      <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+        <div class="search-header"><div><span class="eyebrow">Nimbora</span><h2 id="searchTitle">Find a location</h2></div><button id="closeSearch" class="close-search" type="button" aria-label="Close search">×</button></div>
+        <form id="searchForm" class="search-form"><input id="searchInput" type="search" autocomplete="off" placeholder="Search city, town or postcode…" aria-label="Search city, town or postcode"><button type="submit">Search</button></form>
+        <button id="useLocation" class="use-location" type="button">⌖ Use my current location</button>
+        <div id="searchStatus" class="search-status" aria-live="polite"></div>
+        <div id="searchResults" class="search-results"></div>
+      </div>
+    </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="loading" class="loading" hidden><span></span> Updating weather…</div>
   </div>
   <script src="src/app.js"></script>
 </body>
