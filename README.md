@@ -13,27 +13,21 @@ A modern weather forecasting website inspired by the supplied weather-app interf
 - Browser Geolocation API
 - LocalStorage for the last selected location
 
-## Phase 3 — Live weather
+## Phase 4 — Advanced forecast
 
 Implemented:
 
-- Live current temperature and conditions
-- Real high/low temperatures
-- 7-day forecast data with the first 5 days displayed
-- Live hourly temperature forecast
-- Dynamic temperature graph
-- Weather-code to condition/icon mapping
-- Humidity and feels-like temperature
-- Wind direction, speed and arrow
-- UV index
-- US AQI with a simple quality label
-- Rain/thunderstorm condition messaging
-- City/town location search
-- Browser geolocation
-- Saved last location
-- Loading, empty and error states
-
-Open-Meteo provides the forecast endpoint with current, hourly and daily variables, including temperature, humidity, apparent temperature, wind, weather code and UV index. citehttps://open-meteo.com/en/docs
+- Detailed precipitation probability and expected rainfall
+- Cloud-cover information
+- Maximum wind-gust information
+- Daily rain probability
+- Sunrise and sunset times
+- Expanded hourly forecast with precipitation probability
+- 24-hour temperature graph using live hourly data
+- Full interactive 7-day forecast panel
+- Daily UV, precipitation and wind metadata
+- Detailed forecast card and quick-scroll interaction
+- Responsive forecast detail layouts
 
 ## Project structure
 
@@ -52,9 +46,11 @@ Nimbora-Weather/
 1. ~~Reference UI foundation~~
 2. ~~Polished responsive interface~~
 3. ~~Live weather API + location search~~
-4. Advanced forecast details and precipitation probability
+4. ~~Advanced forecast details~~
 5. Weather alerts, radar and interactive maps
 6. Favorites / multiple saved locations
 7. Theme and unit preferences
 8. PWA/offline support
 9. Production deployment
+
+Weather and forecast data are provided by Open-Meteo. citehttps://open-meteo.com/en/docs
