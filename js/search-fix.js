@@ -33,7 +33,8 @@
       }
     });
   }
-  window.nimboraSearchFix = { init };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  window.meghdootSearchFix = { init };
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
