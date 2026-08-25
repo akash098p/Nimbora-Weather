@@ -1,6 +1,25 @@
-# Meghdoot
+# Meghdoot-Weather 
 
 **Meghdoot** (Sanskrit for "cloud messenger") is a modern, mobile-first weather forecasting web app built with pure **HTML, CSS and vanilla JavaScript** — no frameworks, no build step. It delivers live conditions, a synchronized 24-hour chart, a full 7-day forecast, air quality, an interactive rain-radar map, animated weather visuals and user preferences, all in a responsive glassmorphism interface.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet" />
+  <img src="https://img.shields.io/badge/Open--Meteo-00599C?style=for-the-badge&logo=cloud&logoColor=white" alt="Open-Meteo" />
+  <img src="https://img.shields.io/badge/Mobile--First-00A67E?style=for-the-badge&logo=responsive&logoColor=white" alt="Mobile First" />
+</p>
+
+---
+
+## 📹 Live Demo
+
+| Demo 1 | Demo 2 |
+| :---: | :---: |
+| <video src="https://github.com/user-attachments/assets/b21d4a7a-c220-41d1-bc76-de8415cf7b90" width="100%"></video> | <video src="https://github.com/user-attachments/assets/2cf8c49b-6376-4398-b68d-a9c1b6248b5b" width="100%"></video> |
+
+---
 
 ## ✨ Features
 
@@ -31,6 +50,8 @@
 - Preferences menu: Celsius/Fahrenheit units, System/Light/Dark theme, auto-refresh toggle
 - Kolkata, India is used as the default city on first visit; your last selected location persists across visits
 
+---
+
 ## 🧱 Tech stack
 
 | Layer      | Technology                                              |
@@ -43,6 +64,8 @@
 | Radar      | [RainViewer](https://www.rainviewer.com/) public API    |
 | Map tiles  | OpenStreetMap · OpenTopoMap                             |
 | Storage    | `localStorage` (location, settings, saved places)       |
+
+---
 
 ## 🚀 Getting started
 
@@ -63,6 +86,8 @@ No installation or build step is required.
 3. Visit `http://localhost:8080`.
 
 > An internet connection is required for live weather data, map tiles and radar.
+
+---
 
 ## 📁 Project structure
 
@@ -96,23 +121,13 @@ Meghdoot/
 
 Legacy prototypes (`app.js`, `interactive-map.js`, `radar.js`, `weather-layers.js` and their stylesheets) remain in the repository but are **not loaded** by `index.html`.
 
+---
+
 ## 🔌 Data sources
 
 - **Forecast, geocoding & air quality** — [Open-Meteo](https://open-meteo.com/en/docs) (free, no API key required)
 - **Rain radar tiles** — [RainViewer](https://www.rainviewer.com/) public weather-maps API
 - **Map imagery** — © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, [OpenTopoMap](https://opentopomap.org)
-
-## 🗺️ Roadmap
-
-1. ~~Reference UI foundation~~
-2. ~~Polished responsive interface~~
-3. ~~Live weather API + location search~~
-4. ~~Advanced forecast details~~
-5. ~~Interactive maps, radar & weather visuals~~
-6. ~~Favorites / multiple saved locations~~
-7. ~~Theme and unit preferences~~
-8. PWA / offline support
-9. Production deployment
 
 ---
 
