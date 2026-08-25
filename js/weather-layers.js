@@ -1,4 +1,4 @@
-const NimboraLayers = {
+const MeghdootLayers = {
   map: null,
   radar: null,
   marker: null,
@@ -40,9 +40,9 @@ function tilePoint(lat, lon, z) {
 }
 function ensureMap() {
   const el = document.querySelector("#interactiveMap");
-  const p = window.nimboraGetPlace?.();
+  const p = window.meghdootGetPlace?.();
   if (!el || !p || !window.L) return;
-  if (NimboraLayers.map) NimboraLayers.map.remove();
+  if (MeghdootLayers.map) MeghdootLayers.map.remove();
   el.innerHTML = "";
   el.classList.add("leaflet-ready");
   const map = L.map(el, {
@@ -54,8 +54,8 @@ function ensureMap() {
     maxZoom: 19,
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
-  NimboraLayers.map = map;
-  NimboraLayers.marker = L.circleMarker([p.latitude, p.longitude], {
+  MeghdootLayers.map = map;
+  MeghdootLayers.marker = L.circleMarker([p.latitude, p.longitude], {
     radius: 7,
     weight: 2,
     fillOpacity: 0.9,
@@ -66,15 +66,15 @@ function ensureMap() {
   applyLayer("map");
 }
 async function radar() {
-  if (!NimboraLayers.map) return;
+  if (!MeghdootLayers.map) return;
   try {
     const d = await fetch(RV, { cache: "no-store" }).then((r) => r.json());
-    NimboraLayers.frames = d.radar?.past || [];
-    NimboraLayers.frame = Math.max(0, NimboraLayers.frames.length - 1);
-    if (NimboraLayers.radar) NimboraLayers.map.removeLayer(NimboraLayers.radar);
-    const f = NimboraLayers.frames[NimboraLayers.frame];
+    MeghdootLayers.frames = d.radar?.past || [];
+    MeghdootLayers.frame = Math.max(0, MeghdootLayers.frames.length - 1);
+    if (MeghdootLayers.radar) MeghdootLayers.map.removeLayer(MeghdootLayers.radar);
+    const f = MeghdootLayers.frames[MeghdootLayers.frame];
     if (!f) throw Error("No radar frame");
-    NimboraLayers.radar = L.tileLayer(
+    MeghdootLayers.radar = L.tileLayer(
       `https://tilecache.rainviewer.com${f.path}/256/{z}/{x}/{y}/2/1_1.png`,
       {
         opacity: 0.65,
@@ -82,7 +82,7 @@ async function radar() {
         zIndex: 500,
         attribution: "Radar © RainViewer",
       },
-    ).addTo(NimboraLayers.map);
+    ).addTo(MeghdootLayers.map);
     setStatus(
       `Rain radar · ${new Date(f.time * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
     );
@@ -92,8 +92,8 @@ async function radar() {
   }
 }
 async function grid() {
-  const p = window.nimboraGetPlace?.();
-  if (!p || !NimboraLayers.map) return;
+  const p = window.meghdootGetPlace?.();
+  if (!p || !MeghdootLayers.map) return;
   const latStep = 1.2,
     lonStep = 1.2,
     pts = [];
@@ -121,7 +121,7 @@ async function grid() {
         : [d.current]
       : [];
     if (!arr.length) throw Error("grid response unavailable");
-    NimboraLayers.points = arr;
+    MeghdootLayers.points = arr;
     drawGrid(arr);
   } catch (e) {
     console.error(e);
@@ -129,10 +129,10 @@ async function grid() {
   }
 }
 function drawGrid(arr) {
-  if (!NimboraLayers.map) return;
-  const p = window.nimboraGetPlace?.();
-  if (NimboraLayers.pointsLayer)
-    NimboraLayers.map.removeLayer(NimboraLayers.pointsLayer);
+  if (!MeghdootLayers.map) return;
+  const p = window.meghdootGetPlace?.();
+  if (MeghdootLayers.pointsLayer)
+    MeghdootLayers.map.removeLayer(MeghdootLayers.pointsLayer);
   const g = L.layerGroup();
   arr.forEach((x, i) => {
     const lat = x.latitude ?? x.lat,
@@ -143,24 +143,24 @@ function drawGrid(arr) {
       gust = Number(x.wind_gusts_10m ?? 0),
       code = Number(x.weather_code ?? 0);
     let show =
-      NimboraLayers.mode === "rain"
+      MeghdootLayers.mode === "rain"
         ? rain > 0.05
-        : NimboraLayers.mode === "wind"
+        : MeghdootLayers.mode === "wind"
           ? wind >= 10
-          : NimboraLayers.mode === "thunder"
+          : MeghdootLayers.mode === "thunder"
             ? code >= 95
-            : NimboraLayers.mode === "cyclone"
+            : MeghdootLayers.mode === "cyclone"
               ? gust >= 63 || wind >= 63 || code >= 95
               : false;
     if (!show) return;
     let value, label;
-    if (NimboraLayers.mode === "rain") {
+    if (MeghdootLayers.mode === "rain") {
       value = Math.min(100, Math.max(10, rain * 25));
       label = `Rain ${rain.toFixed(1)} mm`;
-    } else if (NimboraLayers.mode === "wind") {
+    } else if (MeghdootLayers.mode === "wind") {
       value = Math.min(100, wind);
       label = `Wind ${Math.round(wind)} km/h · Gust ${Math.round(gust)} km/h`;
-    } else if (NimboraLayers.mode === "thunder") {
+    } else if (MeghdootLayers.mode === "thunder") {
       value = code >= 95 ? 90 : 0;
       label = "Thunderstorm risk";
     } else {
@@ -169,13 +169,13 @@ function drawGrid(arr) {
     }
     const c = L.circleMarker([lat, lon], {
       radius:
-        NimboraLayers.mode === "wind"
+        MeghdootLayers.mode === "wind"
           ? Math.max(8, Math.min(18, wind / 2))
           : Math.max(7, value / 9),
       weight: 1,
       fillOpacity: 0.45,
     }).bindTooltip(`${label}<br>Code ${code}`, { direction: "top" });
-    if (NimboraLayers.mode === "wind") {
+    if (MeghdootLayers.mode === "wind") {
       const icon = L.divIcon({
         className: "wind-marker",
         html: `<span style="transform:rotate(${Number(x.wind_direction_10m || 0)}deg)">➤</span><b>${Math.round(wind)}</b>`,
@@ -187,22 +187,22 @@ function drawGrid(arr) {
         .addTo(g);
     } else c.addTo(g);
   });
-  NimboraLayers.pointsLayer = g.addTo(NimboraLayers.map);
+  MeghdootLayers.pointsLayer = g.addTo(MeghdootLayers.map);
 }
 async function applyLayer(mode) {
-  NimboraLayers.mode = mode;
+  MeghdootLayers.mode = mode;
   document
     .querySelectorAll("[data-weather-layer]")
     .forEach((b) =>
       b.classList.toggle("active", b.dataset.weatherLayer === mode),
     );
-  if (NimboraLayers.radar) {
-    NimboraLayers.map.removeLayer(NimboraLayers.radar);
-    NimboraLayers.radar = null;
+  if (MeghdootLayers.radar) {
+    MeghdootLayers.map.removeLayer(MeghdootLayers.radar);
+    MeghdootLayers.radar = null;
   }
-  if (NimboraLayers.pointsLayer) {
-    NimboraLayers.map.removeLayer(NimboraLayers.pointsLayer);
-    NimboraLayers.pointsLayer = null;
+  if (MeghdootLayers.pointsLayer) {
+    MeghdootLayers.map.removeLayer(MeghdootLayers.pointsLayer);
+    MeghdootLayers.pointsLayer = null;
   }
   setStatus(layerLabels[mode] || "Weather layer");
   if (mode === "rain") return radar();
@@ -221,19 +221,19 @@ async function initLayers() {
       .forEach((b) => (b.onclick = () => applyLayer(b.dataset.weatherLayer)));
     document
       .querySelector("#mapZoomIn")
-      ?.addEventListener("click", () => NimboraLayers.map?.zoomIn());
+      ?.addEventListener("click", () => MeghdootLayers.map?.zoomIn());
     document
       .querySelector("#mapZoomOut")
-      ?.addEventListener("click", () => NimboraLayers.map?.zoomOut());
+      ?.addEventListener("click", () => MeghdootLayers.map?.zoomOut());
     document.querySelector("#mapReset")?.addEventListener("click", () => {
-      const p = window.nimboraGetPlace?.();
-      if (p) NimboraLayers.map?.flyTo([p.latitude, p.longitude], 8);
+      const p = window.meghdootGetPlace?.();
+      if (p) MeghdootLayers.map?.flyTo([p.latitude, p.longitude], 8);
     });
     document.querySelector("#leafletLocate")?.addEventListener("click", () => {
-      const p = window.nimboraGetPlace?.();
-      if (p) NimboraLayers.map?.flyTo([p.latitude, p.longitude], 10);
+      const p = window.meghdootGetPlace?.();
+      if (p) MeghdootLayers.map?.flyTo([p.latitude, p.longitude], 10);
     });
-    window.nimboraWeatherLayers = { refresh: ensureMap, apply: applyLayer };
+    window.meghdootWeatherLayers = { refresh: ensureMap, apply: applyLayer };
   } catch (e) {
     console.error(e);
     setStatus("Interactive map unavailable");
