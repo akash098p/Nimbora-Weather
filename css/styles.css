@@ -589,10 +589,13 @@ input {
   isolation: isolate;
   padding: 24px 24px 22px;
   min-height: 150px;
+  border-radius: 24px;
   display: flex;
   align-items: stretch;
   justify-content: space-between;
   gap: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .metric::before {
   content: "";
@@ -991,40 +994,42 @@ input {
   }
   .metric-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
   }
   .metric {
-    min-height: 132px;
-    padding: 18px;
+    min-height: 118px;
+    padding: 14px 14px 12px;
+    border-radius: 22px;
+    gap: 10px;
   }
   .metric strong {
-    font-size: 19px;
+    font-size: 17px;
   }
   .metric-label {
-    font-size: 10px;
+    font-size: 9px;
   }
   .metric small {
-    font-size: 11px;
+    font-size: 10px;
   }
   .metric-ring,
   .metric-icon,
   .metric-compass {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
   }
   .metric-ring {
-    border-width: 7px;
+    border-width: 6px;
   }
   .metric-ring b {
-    font-size: 19px;
+    font-size: 17px;
   }
   .metric-svg {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
   }
   .wind-arrow {
-    font-size: 34px;
+    font-size: 28px;
   }
   .search-overlay,
   .forecast-overlay {
@@ -1055,31 +1060,35 @@ input {
 }
 @media (max-width: 420px) {
   .metric-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
   .metric {
-    min-height: 126px;
+    min-height: 108px;
+    padding: 12px 12px 10px;
+    border-radius: 18px;
+    gap: 8px;
   }
   .metric strong {
-    font-size: 18px;
+    font-size: 16px;
   }
   .metric-ring,
   .metric-icon,
   .metric-compass {
-    width: 56px;
-    height: 56px;
+    width: 46px;
+    height: 46px;
   }
   .metric-ring {
-    border-width: 7px;
+    border-width: 5px;
   }
   .metric-ring b {
-    font-size: 18px;
+    font-size: 16px;
   }
   .metric-svg {
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
   }
   .wind-arrow {
-    font-size: 32px;
+    font-size: 26px;
   }
 }
