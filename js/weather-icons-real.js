@@ -102,4 +102,4 @@ const RealWeatherIcons = (() => {
   }
   return { render };
 })();
-window.nimboraRealWeatherIcons = RealWeatherIcons;
+window.meghdootRealWeatherIcons = RealWeatherIcons;
