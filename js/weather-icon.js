@@ -1,4 +1,4 @@
-const NimboraWeatherIcon = (() => {
+const MeghdootWeatherIcon = (() => {
   let last = "";
   const el = () => document.querySelector("#currentWeatherIcon");
   function type(code, day) {
@@ -57,13 +57,13 @@ const NimboraWeatherIcon = (() => {
     e.setAttribute("aria-label", t.replaceAll("-", " "));
   }
   function sync() {
-    const w = window.nimboraGetWeather?.();
+    const w = window.meghdootGetWeather?.();
     if (w?.current) render(w.current.weather_code, w.current.is_day);
   }
   return { render, sync };
 })();
-window.nimboraWeatherIcon = NimboraWeatherIcon;
+window.meghdootWeatherIcon = MeghdootWeatherIcon;
 document.addEventListener("DOMContentLoaded", () => {
-  NimboraWeatherIcon.sync();
-  setInterval(NimboraWeatherIcon.sync, 500);
+  MeghdootWeatherIcon.sync();
+  setInterval(MeghdootWeatherIcon.sync, 500);
 });
