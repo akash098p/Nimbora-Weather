@@ -235,7 +235,7 @@ async function loadWeather(place) {
     ]);
     state = { place, weather, air };
     render();
-    localStorage.setItem("nimbora-place", JSON.stringify(place));
+    localStorage.setItem("meghdoot-place", JSON.stringify(place));
   } catch (error) {
     console.error(error);
     showToast("Couldn't load weather. Please try again.");
@@ -538,7 +538,7 @@ document.querySelectorAll("[data-action]").forEach((button) =>
 );
 async function init() {
   try {
-    const saved = localStorage.getItem("nimbora-place");
+    const saved = localStorage.getItem("meghdoot-place");
     await loadWeather(saved ? JSON.parse(saved) : state.place);
   } catch (e) {
     await loadWeather(state.place);
