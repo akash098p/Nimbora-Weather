@@ -230,25 +230,18 @@ input {
   margin: 0 45px 22px 0;
   position: relative;
 }
-.weather-icon-large:before,
-.weather-icon-large:after {
+.weather-icon-large.weather-icon-dynamic:before,
+.weather-icon-large.weather-icon-dynamic:after {
   content: "";
   position: absolute;
   border-radius: 50%;
 }
-.weather-icon-large:before {
+.weather-icon-large.weather-icon-dynamic:before {
   width: 58px;
   height: 58px;
   right: 0;
   top: 0;
   background: linear-gradient(145deg, #ffe995, #ffc84f);
-}
-.weather-icon-large:after {
-  width: 78px;
-  height: 36px;
-  left: 0;
-  bottom: 4px;
-  background: rgba(241, 249, 255, 0.92);
 }
 .condition {
   font-size: 25px;
@@ -289,10 +282,10 @@ input {
 .glass-card {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.19),
-    rgba(255, 255, 255, 0.09)
+    var(--card-fill-start, rgba(255, 255, 255, 0.19)),
+    var(--card-fill-end, rgba(255, 255, 255, 0.09))
   );
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.14));
   box-shadow: var(--shadow);
   backdrop-filter: blur(20px);
   border-radius: 28px;
@@ -591,44 +584,137 @@ input {
   gap: 18px;
 }
 .metric {
-  padding: 22px 24px;
-  min-height: 130px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 24px 24px 22px;
+  min-height: 150px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
+  gap: 18px;
 }
-.metric span {
+.metric::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12), transparent 38%),
+    radial-gradient(circle at 82% 24%, rgba(255, 255, 255, 0.08), transparent 32%);
+  pointer-events: none;
+}
+.metric-uv::before {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(154, 226, 255, 0.3), transparent 38%),
+    linear-gradient(135deg, rgba(90, 179, 255, 0.12), rgba(255, 255, 255, 0.02));
+}
+.metric-humidity::before {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(132, 227, 255, 0.24), transparent 38%),
+    linear-gradient(135deg, rgba(81, 131, 255, 0.12), rgba(255, 255, 255, 0.02));
+}
+.metric-feels::before {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 214, 141, 0.24), transparent 38%),
+    linear-gradient(135deg, rgba(255, 170, 86, 0.12), rgba(255, 255, 255, 0.02));
+}
+.metric-wind::before {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(154, 255, 233, 0.18), transparent 38%),
+    linear-gradient(135deg, rgba(55, 216, 190, 0.1), rgba(255, 255, 255, 0.02));
+}
+.metric-copy,
+.metric-visual {
+  position: relative;
+  z-index: 1;
+}
+.metric-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  flex: 1;
+}
+.metric-label {
   display: block;
   color: rgba(255, 255, 255, 0.66);
-  font-size: 12px;
-  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
 }
 .metric strong {
   display: block;
-  font-size: 23px;
+  font-size: 24px;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
 }
 .metric small {
   display: block;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 11px;
-  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  margin-top: auto;
 }
 .metric-ring {
-  width: 58px;
-  height: 58px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  border: 7px solid rgba(255, 255, 255, 0.18);
-  border-top-color: #c7f1ff;
-  border-right-color: #c7f1ff;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.16), transparent 48%),
+    rgba(255, 255, 255, 0.08);
+  border: 8px solid rgba(255, 255, 255, 0.14);
+  border-top-color: #8ae9ff;
+  border-right-color: #9ff0ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 10px 24px rgba(10, 30, 60, 0.12);
+  flex: 0 0 auto;
 }
-.metric-symbol,
-.wind-arrow {
-  font-size: 34px;
+.metric-ring b {
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.metric-icon,
+.metric-compass {
+  width: 74px;
+  height: 74px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 10px 24px rgba(10, 30, 60, 0.12);
+}
+.metric-svg {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+.metric-thermo {
+  filter: drop-shadow(0 8px 14px rgba(255, 175, 83, 0.18));
+}
+.metric-drop {
+  filter: drop-shadow(0 8px 14px rgba(102, 145, 255, 0.2));
+}
+.metric-wind-svg {
+  width: 46px;
+  height: 46px;
 }
 .wind-arrow {
-  font-size: 42px;
+  font-size: 44px;
+  line-height: 1;
+  display: block;
+  color: #f7fbff;
+  text-shadow: 0 8px 16px rgba(10, 25, 50, 0.18);
+  transform: translateY(-1px);
 }
 .attribution {
   text-align: center;
@@ -860,13 +946,9 @@ input {
     height: 78px;
     margin: 0 18px 18px 0;
   }
-  .weather-icon-large:before {
+  .weather-icon-large.weather-icon-dynamic:before {
     width: 45px;
     height: 45px;
-  }
-  .weather-icon-large:after {
-    width: 62px;
-    height: 30px;
   }
   .condition {
     font-size: 20px;
@@ -912,20 +994,37 @@ input {
     gap: 12px;
   }
   .metric {
-    min-height: 125px;
-    padding: 17px;
+    min-height: 132px;
+    padding: 18px;
   }
   .metric strong {
-    font-size: 18px;
+    font-size: 19px;
   }
-  .metric-symbol,
-  .wind-arrow {
-    font-size: 27px;
+  .metric-label {
+    font-size: 10px;
+  }
+  .metric small {
+    font-size: 11px;
+  }
+  .metric-ring,
+  .metric-icon,
+  .metric-compass {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
   }
   .metric-ring {
-    width: 47px;
-    height: 47px;
-    border-width: 6px;
+    border-width: 7px;
+  }
+  .metric-ring b {
+    font-size: 19px;
+  }
+  .metric-svg {
+    width: 36px;
+    height: 36px;
+  }
+  .wind-arrow {
+    font-size: 34px;
   }
   .search-overlay,
   .forecast-overlay {
@@ -952,5 +1051,35 @@ input {
   }
   .full-temp {
     justify-content: flex-end;
+  }
+}
+@media (max-width: 420px) {
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+  .metric {
+    min-height: 126px;
+  }
+  .metric strong {
+    font-size: 18px;
+  }
+  .metric-ring,
+  .metric-icon,
+  .metric-compass {
+    width: 56px;
+    height: 56px;
+  }
+  .metric-ring {
+    border-width: 7px;
+  }
+  .metric-ring b {
+    font-size: 18px;
+  }
+  .metric-svg {
+    width: 34px;
+    height: 34px;
+  }
+  .wind-arrow {
+    font-size: 32px;
   }
 }
