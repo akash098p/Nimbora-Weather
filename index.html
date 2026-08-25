@@ -4,21 +4,306 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#2f6fb8" />
-    <meta name="description" content="Nimbora — a modern weather forecasting experience." />
-    <title>Nimbora Weather</title>
-    <link rel="stylesheet" href="css/styles.css" /><link rel="stylesheet" href="css/phase6.css" /><link rel="stylesheet" href="css/weather-background.css" /><link rel="stylesheet" href="css/weather-icon.css" /><link rel="stylesheet" href="css/weather-icons-real.css" /><link rel="stylesheet" href="css/search-ui.css" /><link rel="stylesheet" href="css/final-layout-fixes.css" /><link rel="stylesheet" href="css/hourly-chart-fix.css" /><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta
+      name="description"
+      content="Meghdoot — a modern weather forecasting experience."
+    />
+    <title>Meghdoot Weather</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/phase6.css" />
+    <link rel="stylesheet" href="css/weather-background.css" />
+    <link rel="stylesheet" href="css/weather-icon.css" />
+    <link rel="stylesheet" href="css/weather-icons-real.css" />
+    <link rel="stylesheet" href="css/search-ui.css" />
+    <link rel="stylesheet" href="css/final-layout-fixes.css" />
+    <link rel="stylesheet" href="css/hourly-chart-fix.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
   </head>
   <body>
-    <div class="weather-app"><div class="sky-scene" aria-hidden="true"><div class="sun-glow"></div><div class="cloud cloud-one"></div><div class="cloud cloud-two"></div><div class="haze"></div></div>
-      <header class="topbar"><button class="brand" data-action="home">Nimbora</button><button class="location-pill" data-action="location"><span class="pin">⌖</span><span id="headerLocation">Kolkata</span><span class="chevron">⌄</span></button><div class="top-actions"><button data-action="search" aria-label="Search location">⌕</button><button data-action="menu" aria-label="More options">⋮</button></div></header>
-      <main class="content"><section class="hero"><div class="hero-location"><span class="live-dot"></span><span id="heroLocation">Kolkata</span></div><div class="hero-date" id="heroDate">Loading…</div><div class="temperature-row"><div id="currentTemp" class="temperature">--°</div><div id="currentWeatherIcon" class="weather-icon-large weather-icon-dynamic" aria-label="Current weather"></div></div><div class="condition"><span id="conditionText">Loading weather…</span><span class="high-low"><b id="highTemp">--°</b><i></i><b id="lowTemp">--°</b></span></div><div class="aqi"><span>◌</span><span>AQI</span><strong id="aqiValue">--</strong><span id="aqiLabel" class="good">Loading</span></div></section>
-      <section class="glass-card alert-card"><div id="alertIcon" class="alert-icon">i</div><div class="alert-copy"><h2 id="alertTitle">Weather conditions</h2><p id="alertText">Live information</p></div><button class="card-arrow" data-action="details">›</button></section><section class="glass-card forecast-card"><div class="section-heading"><span>◷</span><span>5-day forecast</span><span class="section-caption">Temperature · Rain</span></div><div id="dailyForecast"></div><button class="wide-button" data-action="forecast">View full 7-day forecast <span>›</span></button></section>
-      <section class="glass-card hourly-card"><div class="section-heading"><span>24-hour forecast</span><span class="section-caption">Hourly · swipe →</span></div><div class="chart-wrap"><div class="chart-labels"><span id="chartHigh">--°</span><span>--°</span><span id="chartLow">--°</span></div><svg class="chart" viewBox="0 0 720 190" preserveAspectRatio="none"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-opacity=".28"/><stop offset="1" stop-opacity="0"/></linearGradient></defs><path id="chartArea" class="chart-area"/><path id="chartLine" class="chart-line"/></svg></div><div id="hourlyForecast" class="hourly-list"></div></section>
-      <section class="glass-card detail-card"><div class="section-heading"><span>Today's details</span><span class="section-caption" id="detailDate">Live</span></div><div class="detail-grid"><article><span>Precipitation</span><strong id="precipValue">--%</strong><small id="precipAmount">-- mm expected</small></article><article><span>Cloud cover</span><strong id="cloudValue">--%</strong><small>Sky coverage</small></article><article><span>Wind gusts</span><strong id="gustValue">-- km/h</strong><small>Maximum expected</small></article><article><span>Rain chance</span><strong id="rainValue">--%</strong><small>Daily probability</small></article></div><div class="sun-row"><div><span>Sunrise</span><strong id="sunriseValue">--</strong></div><div class="sun-track"><i></i></div><div class="sunset"><span>Sunset</span><strong id="sunsetValue">--</strong></div></div></section>
-      <section class="glass-card map-card"><div class="section-heading"><span>Live weather map</span><span class="section-caption">Accurate map</span></div><div id="leafletWeatherMap"></div><div class="weather-map-actions"><button class="active" data-weather-layer="map">Map</button><button data-weather-layer="radar">Rain radar</button><button data-weather-layer="terrain">Terrain</button><button id="leafletLocate">⌾ My location</button><button id="leafletRadarRefresh">↻ Refresh radar</button></div><div class="leaflet-map-status"><span id="leafletRadarStatus">Loading radar…</span><span>OpenStreetMap · RainViewer</span></div><div class="radar-note">Rain radar is rendered as a transparent live precipitation layer over the map.</div></section>
-      <section class="glass-card metric-grid"><article class="metric"><div><span>UV index</span><strong id="uvValue">--</strong><small id="uvLabel">Loading</small></div><div class="metric-ring"><b id="uvNumber">--</b></div></article><article class="metric"><div><span>Humidity</span><strong id="humidityValue">--%</strong><small id="humidityLabel">Loading</small></div><div class="metric-symbol">💧</div></article><article class="metric"><div><span>Real feel</span><strong id="feelsValue">--°</strong><small id="feelsLabel">Feels like --°</small></div><div class="metric-symbol">🌡</div></article><article class="metric"><div><span>Wind</span><strong id="windValue">--</strong><small id="windSpeed">-- km/h</small></div><div id="windArrow" class="wind-arrow">↙</div></article></section><p class="attribution">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · Maps © OpenStreetMap contributors · Radar © RainViewer</p></main>
-      <div id="forecastOverlay" class="forecast-overlay" hidden><div class="forecast-panel"><div class="forecast-panel-head"><div><span class="eyebrow">Nimbora forecast</span><h2>7-day forecast</h2></div><button id="closeForecast" class="close-search">×</button></div><div id="fullForecast" class="full-forecast"></div></div></div>
-      <div id="searchOverlay" class="search-overlay" hidden><div class="search-panel"><div class="search-header"><div><span class="eyebrow">Nimbora</span><h2>Find a location</h2></div><button id="closeSearch" class="close-search">×</button></div><form id="searchForm" class="search-form"><input id="searchInput" type="search" placeholder="Search city, town, postcode or country…" aria-label="Search location" /><button type="submit" aria-label="Search"><span>Search</span></button></form><button id="useLocation" class="use-location"><span>Use my current location</span></button><div id="searchStatus" class="search-status"></div><div id="searchResults" class="search-results"></div></div></div><div id="toast" class="toast"></div><div id="loading" class="loading" hidden><span></span> Updating weather…</div></div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="js/default-city.js"></script><script src="js/app-phase5.js"></script><script src="js/phase6.js"></script><script src="js/weather-background.js"></script><script src="js/weather-effects.js"></script><script src="js/weather-icon.js"></script><script src="js/weather-icons-real.js"></script><script src="js/real-icon-init.js"></script><script src="js/search-ui.js"></script><script src="js/search-fix.js"></script><script src="js/leaflet-weather-map.js"></script><script src="js/hourly-chart-fix.js"></script>
+    <div class="weather-app">
+      <div class="sky-scene" aria-hidden="true">
+        <div class="sun-glow"></div>
+        <div class="cloud cloud-one"></div>
+        <div class="cloud cloud-two"></div>
+        <div class="haze"></div>
+      </div>
+      <header class="topbar">
+        <button class="brand" data-action="home">Meghdoot</button
+        ><button class="location-pill" data-action="location">
+          <span class="pin">⌕</span><span id="headerLocation">Kolkata</span
+          ><span class="chevron">▿</span>
+        </button>
+        <div class="top-actions">
+          <button data-action="search" aria-label="Search location">⌕</button
+          ><button data-action="menu" aria-label="More options">⋮</button>
+        </div>
+      </header>
+      <main class="content">
+        <section class="hero">
+          <div class="hero-location">
+            <span class="live-dot"></span><span id="heroLocation">Kolkata</span>
+          </div>
+          <div class="hero-date" id="heroDate">Loading…</div>
+          <div class="temperature-row">
+            <div id="currentTemp" class="temperature">--°</div>
+            <div
+              id="currentWeatherIcon"
+              class="weather-icon-large weather-icon-dynamic"
+              aria-label="Current weather"
+            ></div>
+          </div>
+          <div class="condition">
+            <span id="conditionText">Loading weather…</span
+            ><span class="high-low"
+              ><b id="highTemp">--°</b><i></i><b id="lowTemp">--°</b></span
+            >
+          </div>
+          <div class="aqi">
+            <span>◌</span><span>AQI</span><strong id="aqiValue">--</strong
+            ><span id="aqiLabel" class="good">Loading</span>
+          </div>
+        </section>
+        <section class="glass-card alert-card">
+          <div id="alertIcon" class="alert-icon">i</div>
+          <div class="alert-copy">
+            <h2 id="alertTitle">Weather conditions</h2>
+            <p id="alertText">Live information</p>
+          </div>
+          <button class="card-arrow" data-action="details">›</button>
+        </section>
+        <section class="glass-card forecast-card">
+          <div class="section-heading">
+            <span>◷</span><span>5-day forecast</span
+            ><span class="section-caption">Temperature · Rain</span>
+          </div>
+          <div id="dailyForecast"></div>
+          <button class="wide-button" data-action="forecast">
+            View full 7-day forecast <span>›</span>
+          </button>
+        </section>
+        <section class="glass-card hourly-card">
+          <div class="section-heading">
+            <span>24-hour forecast</span
+            ><span class="section-caption">Hourly · swipe →</span>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-labels">
+              <span id="chartHigh">--°</span><span>--°</span
+              ><span id="chartLow">--°</span>
+            </div>
+            <svg class="chart" viewBox="0 0 720 190" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-opacity=".28" />
+                  <stop offset="1" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path id="chartArea" class="chart-area" />
+              <path id="chartLine" class="chart-line" />
+            </svg>
+          </div>
+          <div id="hourlyForecast" class="hourly-list"></div>
+        </section>
+        <section class="glass-card detail-card">
+          <div class="section-heading">
+            <span>Today's details</span
+            ><span class="section-caption" id="detailDate">Live</span>
+          </div>
+          <div class="detail-grid">
+            <article>
+              <span>Precipitation</span><strong id="precipValue">--%</strong
+              ><small id="precipAmount">-- mm expected</small>
+            </article>
+            <article>
+              <span>Cloud cover</span><strong id="cloudValue">--%</strong
+              ><small>Sky coverage</small>
+            </article>
+            <article>
+              <span>Wind gusts</span><strong id="gustValue">-- km/h</strong
+              ><small>Maximum expected</small>
+            </article>
+            <article>
+              <span>Rain chance</span><strong id="rainValue">--%</strong
+              ><small>Daily probability</small>
+            </article>
+          </div>
+          <div class="sun-row">
+            <div><span>Sunrise</span><strong id="sunriseValue">--</strong></div>
+            <div class="sun-track"><i></i></div>
+            <div class="sunset">
+              <span>Sunset</span><strong id="sunsetValue">--</strong>
+            </div>
+          </div>
+        </section>
+        <section class="glass-card map-card">
+          <div class="section-heading">
+            <span>Live weather map</span
+            ><span class="section-caption">Accurate map</span>
+          </div>
+          <div id="leafletWeatherMap"></div>
+          <div class="weather-map-actions">
+            <button class="active" data-weather-layer="map">Map</button
+            ><button data-weather-layer="radar">Rain radar</button
+            ><button data-weather-layer="terrain">Terrain</button
+            ><button id="leafletLocate">⌾ My location</button
+            ><button id="leafletRadarRefresh">↻ Refresh radar</button>
+          </div>
+          <div class="leaflet-map-status">
+            <span id="leafletRadarStatus">Loading radar…</span
+            ><span>OpenStreetMap · RainViewer</span>
+          </div>
+          <div class="radar-note">
+            Rain radar is rendered as a transparent live precipitation layer
+            over the map.
+          </div>
+        </section>
+        <section class="glass-card metric-grid">
+          <article class="metric metric-uv">
+            <div class="metric-copy">
+              <span class="metric-label">UV index</span>
+              <strong id="uvValue">--</strong>
+              <small id="uvLabel">Loading</small>
+            </div>
+            <div class="metric-visual metric-ring" aria-hidden="true">
+              <b id="uvNumber">--</b>
+            </div>
+          </article>
+          <article class="metric metric-humidity">
+            <div class="metric-copy">
+              <span class="metric-label">Humidity</span>
+              <strong id="humidityValue">--%</strong>
+              <small id="humidityLabel">Loading</small>
+            </div>
+            <div class="metric-visual metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" class="metric-svg metric-drop">
+                <defs>
+                  <linearGradient id="metricDropGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#8be7ff" />
+                    <stop offset="1" stop-color="#6b7dff" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M24 6C24 6 12 20.2 12 28.3 12 35.9 17.9 42 24 42s12-6.1 12-13.7C36 20.2 24 6 24 6Z"
+                  fill="url(#metricDropGrad)"
+                />
+                <path
+                  d="M18 25.5c1.8-4.2 5-7.7 8.7-9.5"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.48)"
+                  stroke-linecap="round"
+                  stroke-width="2"
+                />
+              </svg>
+            </div>
+          </article>
+          <article class="metric metric-feels">
+            <div class="metric-copy">
+              <span class="metric-label">Real feel</span>
+              <strong id="feelsValue">--°</strong>
+              <small id="feelsLabel">Feels like --°</small>
+            </div>
+            <div class="metric-visual metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" class="metric-svg metric-thermo">
+                <defs>
+                  <linearGradient id="metricThermoGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#fff2a8" />
+                    <stop offset="1" stop-color="#ff9d59" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M24 9a5 5 0 0 0-5 5v14.2a9.5 9.5 0 1 0 10 0V14a5 5 0 0 0-5-5Z"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.7)"
+                  stroke-width="3"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M24 17v17"
+                  fill="none"
+                  stroke="url(#metricThermoGrad)"
+                  stroke-linecap="round"
+                  stroke-width="4"
+                />
+                <circle cx="24" cy="34" r="5" fill="url(#metricThermoGrad)" />
+              </svg>
+            </div>
+          </article>
+          <article class="metric metric-wind">
+            <div class="metric-copy">
+              <span class="metric-label">Wind</span>
+              <strong id="windValue">--</strong>
+              <small id="windSpeed">-- km/h</small>
+            </div>
+            <div class="metric-visual metric-compass" aria-hidden="true">
+              <span id="windArrow" class="wind-arrow">↙</span>
+            </div>
+          </article>
+        </section>
+        <p class="attribution">
+          Weather data by
+          <a href="https://open-meteo.com/" target="_blank" rel="noreferrer"
+            >Open-Meteo</a
+          >
+          · Maps © OpenStreetMap contributors · Radar © RainViewer
+        </p>
+      </main>
+      <div id="forecastOverlay" class="forecast-overlay" hidden>
+        <div class="forecast-panel">
+          <div class="forecast-panel-head">
+            <div>
+              <span class="eyebrow">Meghdoot forecast</span>
+              <h2>7-day forecast</h2>
+            </div>
+            <button id="closeForecast" class="close-search">×</button>
+          </div>
+          <div id="fullForecast" class="full-forecast"></div>
+        </div>
+      </div>
+      <div id="searchOverlay" class="search-overlay" hidden>
+        <div class="search-panel">
+          <div class="search-header">
+            <div>
+              <span class="eyebrow">Meghdoot</span>
+              <h2>Find a location</h2>
+            </div>
+            <button id="closeSearch" class="close-search">×</button>
+          </div>
+          <form id="searchForm" class="search-form">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Search city, town, postcode or country…"
+              aria-label="Search location"
+            /><button type="submit" aria-label="Search">
+              <span>Search</span>
+            </button>
+          </form>
+          <button id="useLocation" class="use-location">
+            <span>Use my current location</span>
+          </button>
+          <div id="searchStatus" class="search-status"></div>
+          <div id="searchResults" class="search-results"></div>
+        </div>
+      </div>
+      <div id="toast" class="toast"></div>
+      <div id="loading" class="loading" hidden>
+        <span></span> Updating weather…
+      </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/default-city.js"></script>
+    <script src="js/app-phase5.js"></script>
+    <script src="js/phase6.js"></script>
+    <script src="js/weather-background.js"></script>
+    <script src="js/weather-effects.js"></script>
+    <script src="js/weather-icons-real.js"></script>
+    <script src="js/real-icon-init.js"></script>
+    <script src="js/search-ui.js"></script>
+    <script src="js/search-fix.js"></script>
+    <script src="js/leaflet-weather-map.js"></script>
+    <script src="js/hourly-chart-fix.js"></script>
   </body>
 </html>
