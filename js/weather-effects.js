@@ -59,8 +59,8 @@ function setEffects(code, isDay) {
   }
 }
 function refreshEffects() {
-  const w = window.nimboraGetWeather?.();
+  const w = window.meghdootGetWeather?.();
   if (w?.current) setEffects(w.current.weather_code, !!w.current.is_day);
 }
-window.nimboraEffects = { refresh: refreshEffects };
+window.meghdootEffects = { refresh: refreshEffects };
 document.addEventListener("DOMContentLoaded", refreshEffects);
