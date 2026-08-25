@@ -8,23 +8,14 @@
       const input = $("#searchInput");
       const query = input?.value.trim();
       if (!query || query.length < 2) return;
-      let attempts = 0;
-      const waitForResult = () => {
-        const first = $("#searchResults .result-button");
-        const status = $("#searchStatus");
-        if (first) {
-          first.click();
-          return;
-        }
-        if (++attempts < 60) {
-          window.setTimeout(waitForResult, 100);
-          return;
-        }
-        if (status && /Searching/i.test(status.textContent)) {
-          status.textContent = "No locations found. Try another city.";
-        }
-      };
-      window.setTimeout(waitForResult, 100);
+      const status = $("#searchStatus");
+      if (status && /Searching/i.test(status.textContent)) {
+        window.setTimeout(() => {
+          if (!$("#searchResults .result-button")) {
+            status.textContent = "No locations found. Try another city.";
+          }
+        }, 1200);
+      }
     });
     $("#searchInput")?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
