@@ -1,4 +1,4 @@
-const NimboraLeaflet = {
+const MeghdootLeaflet = {
   map: null,
   base: null,
   terrain: null,
@@ -28,30 +28,30 @@ const status = (t) =>
     .querySelectorAll("#leafletRadarStatus,#interactiveMapStatus")
     .forEach((e) => (e.textContent = t));
 function addStyle() {
-  if (document.querySelector("#nimbora-map-style")) return;
+  if (document.querySelector("#meghdoot-map-style")) return;
   const s = document.createElement("style");
-  s.id = "nimbora-map-style";
+  s.id = "meghdoot-map-style";
   s.textContent =
-    ".nimbora-map-timeline{margin-top:10px;padding:10px 12px;border-radius:15px;background:rgba(8,25,45,.34);color:#fff}.nimbora-map-timeline .tm-head{display:flex;align-items:center;justify-content:space-between;font-size:11px;margin-bottom:7px}.nimbora-map-timeline input{width:100%;accent-color:#69d8ff}.nimbora-map-timeline button{border:0;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;padding:6px 10px}.nimbora-wind-marker{background:rgba(20,45,70,.85);border:1px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;text-align:center;font-size:9px;padding:3px}.nimbora-wind-marker span{font-size:15px;line-height:12px}.nimbora-wind-marker b{display:block}.nimbora-thunder{font-size:20px;text-shadow:0 1px 3px #000}.nimbora-severe{font-size:19px;text-shadow:0 1px 3px #000}.nimbora-rain-dot{stroke:#fff;stroke-width:.5}";
+    ".meghdoot-map-timeline{margin-top:10px;padding:10px 12px;border-radius:15px;background:rgba(8,25,45,.34);color:#fff}.meghdoot-map-timeline .tm-head{display:flex;align-items:center;justify-content:space-between;font-size:11px;margin-bottom:7px}.meghdoot-map-timeline input{width:100%;accent-color:#69d8ff}.meghdoot-map-timeline button{border:0;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;padding:6px 10px}.meghdoot-wind-marker{background:rgba(20,45,70,.85);border:1px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;text-align:center;font-size:9px;padding:3px}.meghdoot-wind-marker span{font-size:15px;line-height:12px}.meghdoot-wind-marker b{display:block}.meghdoot-thunder{font-size:20px;text-shadow:0 1px 3px #000}.meghdoot-severe{font-size:19px;text-shadow:0 1px 3px #000}.meghdoot-rain-dot{stroke:#fff;stroke-width:.5}";
   document.head.appendChild(s);
 }
 function initLeafletMap() {
   const el = document.querySelector("#leafletWeatherMap");
   if (!el || typeof L === "undefined") return;
-  const p = window.nimboraGetPlace?.();
+  const p = window.meghdootGetPlace?.();
   if (!p) return;
-  if (NimboraLeaflet.map) NimboraLeaflet.map.remove();
+  if (MeghdootLeaflet.map) MeghdootLeaflet.map.remove();
   const map = L.map(el, {
     zoomControl: false,
     attributionControl: true,
     preferCanvas: true,
   }).setView([p.latitude, p.longitude], 8);
   L.control.zoom({ position: "topright" }).addTo(map);
-  NimboraLeaflet.base = L.tileLayer(
+  MeghdootLeaflet.base = L.tileLayer(
     "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     { maxZoom: 19, attribution: "© OpenStreetMap contributors" },
   ).addTo(map);
-  NimboraLeaflet.terrain = L.tileLayer(
+  MeghdootLeaflet.terrain = L.tileLayer(
     "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
     {
       maxZoom: 17,
@@ -61,7 +61,7 @@ function initLeafletMap() {
   L.marker([p.latitude, p.longitude])
     .addTo(map)
     .bindPopup(`<b>${p.name || "Selected location"}</b>`);
-  NimboraLeaflet.map = map;
+  MeghdootLeaflet.map = map;
   addStyle();
   injectLayerButtons();
   injectTimeline();
@@ -90,51 +90,51 @@ function injectLayerButtons() {
     .forEach((b) => (b.onclick = () => setLayer(b.dataset.weatherLayer)));
 }
 function injectTimeline() {
-  if (document.querySelector("#nimboraMapTimeline")) return;
+  if (document.querySelector("#meghdootMapTimeline")) return;
   const host = document.querySelector(".weather-map-actions");
   if (!host) return;
   const d = document.createElement("div");
-  d.id = "nimboraMapTimeline";
-  d.className = "nimbora-map-timeline";
+  d.id = "meghdootMapTimeline";
+  d.className = "meghdoot-map-timeline";
   d.innerHTML =
-    '<div class="tm-head"><span id="nimboraTimelineLabel">Forecast timeline</span><button id="nimboraPlay">▶ Play</button></div><input id="nimboraTimeline" type="range" min="0" max="47" value="0" step="1">';
+    '<div class="tm-head"><span id="meghdootTimelineLabel">Forecast timeline</span><button id="meghdootPlay">▶ Play</button></div><input id="meghdootTimeline" type="range" min="0" max="47" value="0" step="1">';
   host.parentElement.appendChild(d);
-  d.querySelector("#nimboraTimeline").oninput = (e) => {
-    NimboraLeaflet.hour = +e.target.value;
+  d.querySelector("#meghdootTimeline").oninput = (e) => {
+    MeghdootLeaflet.hour = +e.target.value;
     renderForecastLayer();
   };
-  d.querySelector("#nimboraPlay").onclick = togglePlay;
+  d.querySelector("#meghdootPlay").onclick = togglePlay;
 }
 function updateTimeline() {
-  const s = document.querySelector("#nimboraTimeline"),
-    l = document.querySelector("#nimboraTimelineLabel");
-  if (s) s.value = NimboraLeaflet.hour;
-  if (l && NimboraLeaflet.grid?.times?.[NimboraLeaflet.hour])
+  const s = document.querySelector("#meghdootTimeline"),
+    l = document.querySelector("#meghdootTimelineLabel");
+  if (s) s.value = MeghdootLeaflet.hour;
+  if (l && MeghdootLeaflet.grid?.times?.[MeghdootLeaflet.hour])
     l.textContent = new Intl.DateTimeFormat("en-IN", {
       weekday: "short",
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
-      timeZone: NimboraLeaflet.grid.timezone || undefined,
-    }).format(new Date(NimboraLeaflet.grid.times[NimboraLeaflet.hour]));
+      timeZone: MeghdootLeaflet.grid.timezone || undefined,
+    }).format(new Date(MeghdootLeaflet.grid.times[MeghdootLeaflet.hour]));
 }
 function togglePlay() {
-  if (NimboraLeaflet.playing) {
-    clearInterval(NimboraLeaflet.playTimer);
-    NimboraLeaflet.playing = false;
-    document.querySelector("#nimboraPlay").textContent = "▶ Play";
+  if (MeghdootLeaflet.playing) {
+    clearInterval(MeghdootLeaflet.playTimer);
+    MeghdootLeaflet.playing = false;
+    document.querySelector("#meghdootPlay").textContent = "▶ Play";
     return;
   }
-  if (!NimboraLeaflet.grid) {
-    loadGrid(NimboraLeaflet.mode);
+  if (!MeghdootLeaflet.grid) {
+    loadGrid(MeghdootLeaflet.mode);
     return;
   }
-  NimboraLeaflet.playing = true;
-  document.querySelector("#nimboraPlay").textContent = "❚❚ Pause";
-  NimboraLeaflet.playTimer = setInterval(() => {
-    NimboraLeaflet.hour =
-      (NimboraLeaflet.hour + 1) %
-      Math.min(48, NimboraLeaflet.grid.times.length);
+  MeghdootLeaflet.playing = true;
+  document.querySelector("#meghdootPlay").textContent = "❚❚ Pause";
+  MeghdootLeaflet.playTimer = setInterval(() => {
+    MeghdootLeaflet.hour =
+      (MeghdootLeaflet.hour + 1) %
+      Math.min(48, MeghdootLeaflet.grid.times.length);
     renderForecastLayer();
   }, 650);
 }
@@ -144,15 +144,15 @@ async function loadRadarOverlay() {
     const r = await fetch(RV_META, { cache: "no-store" });
     if (!r.ok) throw Error(r.status);
     const d = await r.json();
-    NimboraLeaflet.radarFrames = d.radar?.past || [];
-    NimboraLeaflet.radarIndex = NimboraLeaflet.radarFrames.length - 1;
-    if (!NimboraLeaflet.radarFrames.length) throw Error("No radar frames");
-    if (NimboraLeaflet.mode === "radar") applyRadarOverlay();
+    MeghdootLeaflet.radarFrames = d.radar?.past || [];
+    MeghdootLeaflet.radarIndex = MeghdootLeaflet.radarFrames.length - 1;
+    if (!MeghdootLeaflet.radarFrames.length) throw Error("No radar frames");
+    if (MeghdootLeaflet.mode === "radar") applyRadarOverlay();
     else
       status(
         "Radar ready · " +
           new Date(
-            NimboraLeaflet.radarFrames[NimboraLeaflet.radarIndex].time * 1000,
+            MeghdootLeaflet.radarFrames[MeghdootLeaflet.radarIndex].time * 1000,
           ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       );
   } catch (e) {
@@ -161,11 +161,11 @@ async function loadRadarOverlay() {
   }
 }
 function applyRadarOverlay() {
-  const f = NimboraLeaflet.radarFrames[NimboraLeaflet.radarIndex];
-  if (!f || !NimboraLeaflet.map) return;
-  if (NimboraLeaflet.radar)
-    NimboraLeaflet.map.removeLayer(NimboraLeaflet.radar);
-  NimboraLeaflet.radar = L.tileLayer(
+  const f = MeghdootLeaflet.radarFrames[MeghdootLeaflet.radarIndex];
+  if (!f || !MeghdootLeaflet.map) return;
+  if (MeghdootLeaflet.radar)
+    MeghdootLeaflet.map.removeLayer(MeghdootLeaflet.radar);
+  MeghdootLeaflet.radar = L.tileLayer(
     `https://tilecache.rainviewer.com${f.path}/256/{z}/{x}/{y}/2/1_1.png`,
     {
       opacity: 0.72,
@@ -175,7 +175,7 @@ function applyRadarOverlay() {
       zIndex: 600,
       attribution: "Radar © RainViewer",
     },
-  ).addTo(NimboraLeaflet.map);
+  ).addTo(MeghdootLeaflet.map);
   status(
     "Radar · " +
       new Date(f.time * 1000).toLocaleTimeString([], {
@@ -185,18 +185,18 @@ function applyRadarOverlay() {
   );
 }
 function clearData() {
-  if (NimboraLeaflet.radar) {
-    NimboraLeaflet.map.removeLayer(NimboraLeaflet.radar);
-    NimboraLeaflet.radar = null;
+  if (MeghdootLeaflet.radar) {
+    MeghdootLeaflet.map.removeLayer(MeghdootLeaflet.radar);
+    MeghdootLeaflet.radar = null;
   }
-  if (NimboraLeaflet.points) {
-    NimboraLeaflet.map.removeLayer(NimboraLeaflet.points);
-    NimboraLeaflet.points = null;
+  if (MeghdootLeaflet.points) {
+    MeghdootLeaflet.map.removeLayer(MeghdootLeaflet.points);
+    MeghdootLeaflet.points = null;
   }
 }
 async function loadGrid(mode) {
-  const p = window.nimboraGetPlace?.();
-  if (!p || !NimboraLeaflet.map) return;
+  const p = window.meghdootGetPlace?.();
+  if (!p || !MeghdootLeaflet.map) return;
   status("Loading " + statusText[mode].toLowerCase() + "…");
   const pts = [];
   for (let a = -2; a <= 2; a++)
@@ -220,17 +220,17 @@ async function loadGrid(mode) {
       return r.json();
     });
     const rows = Array.isArray(d) ? d : [d];
-    NimboraLeaflet.grid = {
+    MeghdootLeaflet.grid = {
       rows,
       times: rows[0]?.hourly?.time || [],
       timezone: rows[0]?.timezone,
     };
-    NimboraLeaflet.hour = Math.min(
-      NimboraLeaflet.hour,
-      Math.max(0, NimboraLeaflet.grid.times.length - 1),
+    MeghdootLeaflet.hour = Math.min(
+      MeghdootLeaflet.hour,
+      Math.max(0, MeghdootLeaflet.grid.times.length - 1),
     );
-    const s = document.querySelector("#nimboraTimeline");
-    if (s) s.max = Math.min(47, NimboraLeaflet.grid.times.length - 1);
+    const s = document.querySelector("#meghdootTimeline");
+    if (s) s.max = Math.min(47, MeghdootLeaflet.grid.times.length - 1);
     renderForecastLayer();
   } catch (e) {
     console.error(e);
@@ -238,8 +238,8 @@ async function loadGrid(mode) {
   }
 }
 function drawGrid(rows, mode) {
-  if (NimboraLeaflet.points)
-    NimboraLeaflet.map.removeLayer(NimboraLeaflet.points);
+  if (MeghdootLeaflet.points)
+    MeghdootLeaflet.map.removeLayer(MeghdootLeaflet.points);
   const group = L.layerGroup();
   rows.forEach((x) => {
     const lat = x.latitude,
@@ -252,7 +252,7 @@ function drawGrid(rows, mode) {
       code = Number(x.weather_code ?? 0);
     if (mode === "wind" && wind >= 8) {
       const icon = L.divIcon({
-        className: "nimbora-wind-marker",
+        className: "meghdoot-wind-marker",
         html: `<span style="display:block;transform:rotate(${dir}deg)">➤</span><b>${Math.round(wind)}</b>`,
         iconSize: [46, 34],
         iconAnchor: [23, 17],
@@ -266,7 +266,7 @@ function drawGrid(rows, mode) {
     if (mode === "rain" && rain > 0.05)
       L.circleMarker([lat, lon], {
         radius: Math.min(24, 8 + rain * 3),
-        className: "nimbora-rain-dot",
+        className: "meghdoot-rain-dot",
         fillOpacity: 0.48,
       })
         .bindTooltip(`🌧️ Rain ${rain.toFixed(1)} mm`)
@@ -274,7 +274,7 @@ function drawGrid(rows, mode) {
     if (mode === "thunder" && code >= 95)
       L.marker([lat, lon], {
         icon: L.divIcon({
-          className: "nimbora-thunder",
+          className: "meghdoot-thunder",
           html: "⛈️",
           iconSize: [28, 28],
           iconAnchor: [14, 14],
@@ -285,7 +285,7 @@ function drawGrid(rows, mode) {
     if (mode === "cyclone" && (gust >= 63 || wind >= 63 || code >= 95))
       L.marker([lat, lon], {
         icon: L.divIcon({
-          className: "nimbora-severe",
+          className: "meghdoot-severe",
           html: "🌀",
           iconSize: [28, 28],
           iconAnchor: [14, 14],
@@ -294,18 +294,18 @@ function drawGrid(rows, mode) {
         .bindTooltip(`🌀 Severe storm risk · gust ${Math.round(gust)} km/h`)
         .addTo(group);
   });
-  NimboraLeaflet.points = group.addTo(NimboraLeaflet.map);
+  MeghdootLeaflet.points = group.addTo(MeghdootLeaflet.map);
 }
 function renderForecastLayer() {
   if (
-    !NimboraLeaflet.grid ||
-    NimboraLeaflet.mode === "radar" ||
-    NimboraLeaflet.mode === "map" ||
-    NimboraLeaflet.mode === "terrain"
+    !MeghdootLeaflet.grid ||
+    MeghdootLeaflet.mode === "radar" ||
+    MeghdootLeaflet.mode === "map" ||
+    MeghdootLeaflet.mode === "terrain"
   )
     return;
-  const i = NimboraLeaflet.hour,
-    rows = NimboraLeaflet.grid.rows.map((x) => {
+  const i = MeghdootLeaflet.hour,
+    rows = MeghdootLeaflet.grid.rows.map((x) => {
       const h = x.hourly || {};
       return {
         latitude: x.latitude,
@@ -317,58 +317,58 @@ function renderForecastLayer() {
         weather_code: h.weather_code?.[i] ?? 0,
       };
     });
-  drawGrid(rows, NimboraLeaflet.mode);
+  drawGrid(rows, MeghdootLeaflet.mode);
   updateTimeline();
-  const t = NimboraLeaflet.grid.times[i];
+  const t = MeghdootLeaflet.grid.times[i];
   if (t)
     status(
-      `${statusText[NimboraLeaflet.mode]} · ${new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(t))}`,
+      `${statusText[MeghdootLeaflet.mode]} · ${new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(t))}`,
     );
 }
 function setLayer(mode) {
-  if (!NimboraLeaflet.map) return;
-  NimboraLeaflet.mode = mode;
+  if (!MeghdootLeaflet.map) return;
+  MeghdootLeaflet.mode = mode;
   document
     .querySelectorAll("[data-weather-layer]")
     .forEach((b) =>
       b.classList.toggle("active", b.dataset.weatherLayer === mode),
     );
   clearData();
-  if (NimboraLeaflet.base) NimboraLeaflet.map.removeLayer(NimboraLeaflet.base);
-  if (NimboraLeaflet.terrain)
-    NimboraLeaflet.map.removeLayer(NimboraLeaflet.terrain);
+  if (MeghdootLeaflet.base) MeghdootLeaflet.map.removeLayer(MeghdootLeaflet.base);
+  if (MeghdootLeaflet.terrain)
+    MeghdootLeaflet.map.removeLayer(MeghdootLeaflet.terrain);
   if (mode === "map") {
-    NimboraLeaflet.base.addTo(NimboraLeaflet.map);
+    MeghdootLeaflet.base.addTo(MeghdootLeaflet.map);
     status("Street map");
     return;
   }
   if (mode === "terrain") {
-    NimboraLeaflet.terrain.addTo(NimboraLeaflet.map);
+    MeghdootLeaflet.terrain.addTo(MeghdootLeaflet.map);
     status("Terrain map");
     return;
   }
-  NimboraLeaflet.base.addTo(NimboraLeaflet.map);
+  MeghdootLeaflet.base.addTo(MeghdootLeaflet.map);
   if (mode === "radar")
-    return NimboraLeaflet.radarFrames.length
+    return MeghdootLeaflet.radarFrames.length
       ? applyRadarOverlay()
       : loadRadarOverlay();
-  if (!NimboraLeaflet.grid) return loadGrid(mode);
+  if (!MeghdootLeaflet.grid) return loadGrid(mode);
   renderForecastLayer();
 }
 function init() {
   initLeafletMap();
   document.querySelector("#leafletLocate")?.addEventListener("click", () => {
-    const p = window.nimboraGetPlace?.();
+    const p = window.meghdootGetPlace?.();
     if (p)
-      NimboraLeaflet.map?.flyTo([p.latitude, p.longitude], 9, {
+      MeghdootLeaflet.map?.flyTo([p.latitude, p.longitude], 9, {
         duration: 0.7,
       });
   });
   document
     .querySelector("#leafletRadarRefresh")
     ?.addEventListener("click", loadRadarOverlay);
-  window.addEventListener("resize", () => NimboraLeaflet.map?.invalidateSize());
-  window.nimboraLeafletMap = {
+  window.addEventListener("resize", () => MeghdootLeaflet.map?.invalidateSize());
+  window.meghdootLeafletMap = {
     refresh: initLeafletMap,
     radarRefresh: loadRadarOverlay,
     setLayer,
