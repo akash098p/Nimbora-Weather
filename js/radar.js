@@ -29,7 +29,7 @@ async function loadRadar() {
 function renderRadar() {
   const f = Radar.frames[Radar.index];
   if (!f) return;
-  const { latitude, longitude } = window.nimboraGetPlace?.() || {};
+  const { latitude, longitude } = window.meghdootGetPlace?.() || {};
   const host = "https://tilecache.rainviewer.com";
   const center = latitude && longitude ? `/${latitude}/${longitude}` : "";
   const url = `${host}${f.path}/512/7${center}/2/1_1.png`;
@@ -66,5 +66,5 @@ function initRadar() {
   });
   loadRadar();
 }
-window.nimboraRadar = { refresh: loadRadar };
+window.meghdootRadar = { refresh: loadRadar };
 document.addEventListener("DOMContentLoaded", initRadar);
