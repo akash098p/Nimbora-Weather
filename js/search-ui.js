@@ -33,5 +33,5 @@
     const overlay = document.querySelector("#searchOverlay");
     if (overlay) observer.observe(overlay, { childList: true, subtree: true });
   });
-  window.nimboraSearchIcons = icon;
+  window.meghdootSearchIcons = icon;
 })();
