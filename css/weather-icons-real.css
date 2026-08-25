@@ -3,6 +3,11 @@
   place-items: center;
   overflow: visible;
 }
+.weather-icon-large.real-weather-icon::before,
+.weather-icon-large.real-weather-icon::after {
+  display: none !important;
+  content: none !important;
+}
 .real-weather-svg {
   width: 100%;
   height: 100%;
