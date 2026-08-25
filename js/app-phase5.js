@@ -85,7 +85,7 @@ const W = {
   96: ["Thunderstorm + hail", "⛈️"],
   99: ["Thunderstorm + hail", "⛈️"],
 };
-let place = JSON.parse(localStorage.getItem("nimbora-place") || "null") || {
+let place = JSON.parse(localStorage.getItem("meghdoot-place") || "null") || {
   name: "Jamki",
   latitude: 21.79,
   longitude: 87.61,
@@ -94,8 +94,26 @@ let place = JSON.parse(localStorage.getItem("nimbora-place") || "null") || {
 let weather = null,
   air = null,
   timer;
+function getUnit() {
+  try {
+    return (
+      JSON.parse(localStorage.getItem("meghdoot-settings") || "{}").unit ||
+      document.documentElement.dataset.unit ||
+      "celsius"
+    );
+  } catch {
+    return document.documentElement.dataset.unit || "celsius";
+  }
+}
+function convertTemp(v) {
+  if (v == null) return null;
+  return getUnit() === "fahrenheit" ? (v * 9) / 5 + 32 : v;
+}
 const info = (c) => W[c] || ["Unknown", "🌡️"],
-  temp = (v) => (v == null ? "--°" : Math.round(v) + "°"),
+  temp = (v) => {
+    const t = convertTemp(v);
+    return t == null ? "--°" : Math.round(t) + "°";
+  },
   toast = (m) => {
     if (!E.toast) return;
     E.toast.textContent = m;
@@ -156,7 +174,7 @@ async function load(p) {
       ).catch(() => null),
     ]);
     place = p;
-    localStorage.setItem("nimbora-place", JSON.stringify(p));
+    localStorage.setItem("meghdoot-place", JSON.stringify(p));
     render();
   } catch (e) {
     console.error(e);
@@ -222,11 +240,12 @@ function render() {
   chart(weather.hourly, c.time);
   details();
   full();
-  window.nimboraGetWeather = () => weather;
-  window.nimboraGetPlace = () => place;
-  window.nimboraBackground?.apply();
-  window.nimboraEffects?.refresh();
-  window.nimboraLeafletMap?.refresh();
+  window.meghdootGetWeather = () => weather;
+  window.meghdootGetPlace = () => place;
+  window.meghdootWeatherRender = render;
+  window.meghdootBackground?.apply();
+  window.meghdootEffects?.refresh();
+  window.meghdootLeafletMap?.refresh();
 }
 function daily(d) {
   const all = [
@@ -381,7 +400,7 @@ document.querySelectorAll("[data-action]").forEach(
           .scrollIntoView({ behavior: "smooth" });
       if (a === "home") scrollTo({ top: 0, behavior: "smooth" });
       if (a === "menu")
-        toast("Use Search or your current location to explore Nimbora.");
+        toast("Use Search or your current location to explore Meghdoot.");
     }),
 );
 document.addEventListener("keydown", (e) => {
