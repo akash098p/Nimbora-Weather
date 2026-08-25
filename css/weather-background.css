@@ -1,6 +1,16 @@
 :root {
   --sky-top: #477fbf;
   --sky-bottom: #73a8e2;
+  --sky-overlay: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(16, 42, 76, 0.1) 56%,
+    rgba(0, 0, 0, 0.05)
+  );
+  --sky-scene-opacity: 1;
+  --card-fill-start: rgba(255, 255, 255, 0.19);
+  --card-fill-end: rgba(255, 255, 255, 0.09);
+  --card-border: rgba(255, 255, 255, 0.14);
 }
 .weather-app {
   background: linear-gradient(
@@ -18,7 +28,15 @@
     transparent 42%,
     rgba(0, 0, 0, 0.08)
   );
+  opacity: var(--sky-scene-opacity);
   transition: background 1s ease;
+}
+.sky-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--sky-overlay);
+  pointer-events: none;
 }
 .sun-glow {
   transition:
@@ -30,6 +48,9 @@
 }
 .sky-scene[data-weather="clear"] .cloud {
   opacity: 0.22;
+}
+.sky-scene[data-weather="clear"] .sun-glow {
+  opacity: 0.9;
 }
 .sky-scene[data-weather="cloud"] .sun-glow {
   opacity: 0.3;
