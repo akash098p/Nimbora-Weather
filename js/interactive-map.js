@@ -21,7 +21,7 @@ function geoTile(lat, lon, z) {
 function renderInteractiveMap() {
   const box = document.querySelector("#interactiveMap");
   if (!box) return;
-  const p = window.nimboraGetPlace?.();
+  const p = window.meghdootGetPlace?.();
   if (!p) return;
   const center = geoTile(p.latitude, p.longitude, WeatherMap.zoom);
   const urls = [];
@@ -89,10 +89,10 @@ function initInteractiveMap() {
               ? "Precipitation radar"
               : "Wind and forecast layer";
       if (b.dataset.layer === "map") renderInteractiveMap();
-      else if (window.nimboraRadar?.refresh) window.nimboraRadar.refresh();
+      else if (window.meghdootRadar?.refresh) window.meghdootRadar.refresh();
     }),
   );
   renderInteractiveMap();
 }
-window.nimboraMap = { refresh: renderInteractiveMap };
+window.meghdootMap = { refresh: renderInteractiveMap };
 document.addEventListener("DOMContentLoaded", initInteractiveMap);
